@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { TypewriterText } from '../ui/TypewriterText';
 import { PERSONAL_INFO } from '../../data/profileData';
@@ -205,48 +205,55 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
   ];
 
   return (
-    <div className="fixed inset-0 z-[58] bg-[#050608] text-white font-mono flex flex-col justify-between overflow-y-auto overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
-      
+    <div className="fixed inset-0 z-[58] bg-[#050608] text-white font-mono flex flex-col overflow-hidden selection:bg-cyan-500 selection:text-slate-950">
+
       {/* Background Interactive Galaxy Canvas */}
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
 
-      {/* Top Bar Header */}
-      <header className="relative z-20 max-w-7xl mx-auto w-full p-4 sm:p-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-950/90 border border-cyan-400/60 overflow-hidden flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-            {BRAND_ASSETS.systemIcon.navbarHome ? (
-              <img src={BRAND_ASSETS.systemIcon.navbarHome} alt="Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-            ) : (
-              <span className="font-bold text-cyan-400">MW</span>
-            )}
-          </div>
-          <div>
-            <div className="font-bold text-sm tracking-wider text-white">{t.galaxySystem}</div>
-            <div className="text-[10px] text-cyan-400 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              <span>{t.galaxyVersion}</span>
+      {/* Top Bar Header — always visible */}
+      <header className="relative z-20 shrink-0 border-b border-slate-900/70 bg-[#050608]/75 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto w-full p-4 sm:p-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-950/90 border border-cyan-400/60 overflow-hidden flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+              {BRAND_ASSETS.systemIcon.navbarHome ? (
+                <img src={BRAND_ASSETS.systemIcon.navbarHome} alt="Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              ) : (
+                <span className="font-bold text-cyan-400">MW</span>
+              )}
+            </div>
+            <div>
+              <div className="font-bold text-sm tracking-wider text-white">{t.galaxySystem}</div>
+              <div className="text-[10px] text-cyan-400 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span>{t.galaxyVersion}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Audio Speech Toggle Button */}
-        <button
-          onClick={() => {
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            setSpeechEnabled(!speechEnabled);
-          }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-xs transition-all shadow-md"
-        >
-          {speechEnabled ? <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
+          {/* Audio Speech Toggle Button */}
+          <button
+            onClick={() => {
+              if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+              setSpeechEnabled(!speechEnabled);
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-xs transition-all shadow-md"
+          >
+            {speechEnabled ? <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
             <span className="hidden sm:inline">{speechEnabled ? t.galaxyAudioOn : t.galaxyAudioOff}</span>
-        </button>
+          </button>
+        </div>
       </header>
 
-      {/* Main Hero & JARVIS Hologram Centerpiece */}
-      <main className="relative z-20 max-w-5xl mx-auto px-4 py-8 w-full flex flex-col items-center justify-center min-h-screen space-y-8 text-center">
-        
+      {/* JARVIS Cosmic Welcomer — anchored directly under the top bar, never moves */}
+      <section className="relative z-20 shrink-0 flex flex-col items-center pt-5 sm:pt-6 pb-1 px-4">
+        <div className="text-[11px] sm:text-xs font-bold tracking-[0.35em] text-cyan-400/90 uppercase flex items-center gap-3">
+          <span className="h-px w-10 sm:w-16 bg-gradient-to-r from-transparent to-cyan-400/60" />
+          {t.galaxyCosmicWelcomer}
+          <span className="h-px w-10 sm:w-16 bg-gradient-to-l from-transparent to-cyan-400/60" />
+        </div>
+
         {/* JARVIS AI Avatar Core */}
-        <div className="relative group cursor-pointer flex flex-col items-center" onClick={() => handleTriggerWarp('bio')}>
+        <div className="relative group cursor-pointer mt-3 flex flex-col items-center" onClick={() => handleTriggerWarp('bio')}>
           <motion.div
             animate={{
               scale: jarvisSpeaking ? [1, 1.12, 1] : [1, 1.05, 1],
@@ -259,13 +266,13 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center relative shadow-2xl z-10 overflow-hidden mx-auto"
           >
-            <img 
-              src={BRAND_ASSETS.jarvisEye.galaxyPortal} 
-              alt="JARVIS AI Core" 
+            <img
+              src={BRAND_ASSETS.jarvisEye.galaxyPortal}
+              alt="JARVIS AI Core"
               className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-full"
               referrerPolicy="no-referrer"
             />
-            
+
             {/* Spinning Outer Orbit Ring */}
             <div className="absolute -inset-3 rounded-full border border-cyan-400/40 border-dashed animate-spin" style={{ animationDuration: '12s' }} />
             <div className="absolute -inset-6 rounded-full border border-blue-500/20 border-dotted animate-spin" style={{ animationDuration: '20s', animationDirection: 'reverse' }} />
@@ -277,99 +284,108 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
             <span>{t.galaxyJarvisTag}</span>
           </div>
         </div>
+      </section>
 
-        {/* Typing Speech Holographic Card */}
-        <div className="max-w-2xl w-full bg-slate-950/80 border border-cyan-500/40 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-[0_0_50px_rgba(6,182,212,0.2)] relative space-y-4 text-left">
-          <div className="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-3">
-            <span className="flex items-center gap-2 text-cyan-400 font-bold">
-              <Terminal className="w-4 h-4" />
-              <span>{t.galaxyTransmission}</span>
-            </span>
-            <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-500/30">
-              {t.galaxyLiveSignal}
-            </span>
-          </div>
+      {/* Scrollable Hero Body */}
+      <main className="relative z-20 flex-1 overflow-y-auto w-full">
+        <div className="min-h-full max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex flex-col items-center justify-center space-y-8 text-center">
 
-          <div className="text-sm sm:text-base text-slate-200 leading-relaxed font-sans min-h-[90px]">
-            <TypewriterText text={jarvisWelcomeMessage} speed={30} delay={400} />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs">
-            <div className="text-slate-400 flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-cyan-400" />
-              <span>{t.galaxyStaffInfo}</span>
+          {/* Typing Speech Holographic Card — fixed size, never grows while typing */}
+          <div className="max-w-2xl w-full bg-slate-950/80 border border-cyan-500/40 rounded-2xl p-6 sm:p-8 backdrop-blur-xl shadow-[0_0_50px_rgba(6,182,212,0.2)] relative space-y-4 text-left">
+            <div className="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-3">
+              <span className="flex items-center gap-2 text-cyan-400 font-bold">
+                <Terminal className="w-4 h-4" />
+                <span>{t.galaxyTransmission}</span>
+              </span>
+              <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-500/30">
+                {t.galaxyLiveSignal}
+              </span>
             </div>
+
+            <div className="relative w-full text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
+              <div className="invisible" aria-hidden="true">{jarvisWelcomeMessage}</div>
+              <div className="absolute inset-0">
+                <TypewriterText text={jarvisWelcomeMessage} speed={30} delay={400} />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs">
+              <div className="text-slate-400 flex items-center gap-2">
+                <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                <span>{t.galaxyStaffInfo}</span>
+              </div>
+              <button
+                onClick={() => handleTriggerWarp('bio')}
+                className="text-cyan-300 hover:text-white font-bold flex items-center gap-1.5 transition-colors"
+              >
+                <span>{t.galaxyExploreCore}</span>
+                <ArrowRight className="w-4 h-4 text-cyan-400" />
+              </button>
+            </div>
+          </div>
+
+          {/* Big Action Hyper-Drive Button */}
+          <div className="pt-2">
             <button
               onClick={() => handleTriggerWarp('bio')}
-              className="text-cyan-300 hover:text-white font-bold flex items-center gap-1.5 transition-colors"
+              disabled={isWarping}
+              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-sm sm:text-base shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-all transform hover:scale-105 active:scale-95"
             >
-              <span>{t.galaxyExploreCore}</span>
-              <ArrowRight className="w-4 h-4 text-cyan-400" />
+              <Rocket className="w-5 h-5 animate-bounce text-cyan-200" />
+              <span>{isWarping ? t.galaxyWarping : t.galaxyEnter}</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
-        </div>
 
-        {/* Big Action Hyper-Drive Button */}
-        <div className="pt-2">
-          <button
-            onClick={() => handleTriggerWarp('bio')}
-            disabled={isWarping}
-            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-sm sm:text-base shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-all transform hover:scale-105 active:scale-95"
-          >
-            <Rocket className="w-5 h-5 animate-bounce text-cyan-200" />
-            <span>{isWarping ? t.galaxyWarping : t.galaxyEnter}</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+          {/* Celestial Destinations Quick Orbit Launchpad */}
+          <div className="pt-4 w-full max-w-4xl space-y-3">
+            <div className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+              <Compass className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
+              <span>{t.galaxySelectDest}</span>
+            </div>
 
-        {/* Celestial Destinations Quick Orbit Launchpad */}
-        <div className="pt-6 w-full max-w-4xl space-y-3">
-          <div className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-            <Compass className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
-            <span>{t.galaxySelectDest}</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+              {celestialDestinations.map((dest) => {
+                const Icon = dest.icon;
+                return (
+                  <motion.div
+                    key={dest.id}
+                    whileHover={{ y: -4, scale: 1.03 }}
+                    onClick={() => handleTriggerWarp(dest.id)}
+                    className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-cyan-400/60 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer group shadow-lg transition-all"
+                  >
+                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-tr ${dest.planetColor} flex items-center justify-center text-white mb-2 shadow-md group-hover:scale-110 transition-transform`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors truncate w-full">
+                      {dest.label}
+                    </div>
+                    <div className="text-[9px] text-slate-400 truncate w-full mt-0.5">
+                      {dest.desc}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {celestialDestinations.map((dest) => {
-              const Icon = dest.icon;
-              return (
-                <motion.div
-                  key={dest.id}
-                  whileHover={{ y: -4, scale: 1.03 }}
-                  onClick={() => handleTriggerWarp(dest.id)}
-                  className="p-3 bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-cyan-400/60 rounded-xl flex flex-col items-center justify-center text-center cursor-pointer group shadow-lg transition-all"
-                >
-                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-tr ${dest.planetColor} flex items-center justify-center text-white mb-2 shadow-md group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors truncate w-full">
-                    {dest.label}
-                  </div>
-                  <div className="text-[9px] text-slate-400 truncate w-full mt-0.5">
-                    {dest.desc}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
+          {/* Footer System Status */}
+          <footer className="w-full pt-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-900">
+            <div>
+              Mahmoud Wehaiba © {new Date().getFullYear()} • {t.galaxyFooter}
+            </div>
+            <div className="flex items-center gap-3 text-[11px] text-cyan-400">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                {t.galaxyFooterStatus}
+              </span>
+              <span>•</span>
+              <span>{t.galaxyLatency}</span>
+            </div>
+          </footer>
 
+        </div>
       </main>
-
-      {/* Footer System Status */}
-      <footer className="relative z-20 max-w-7xl mx-auto w-full p-4 sm:p-6 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-900">
-        <div>
-          Mahmoud Wehaiba © {new Date().getFullYear()} • {t.galaxyFooter}
-        </div>
-        <div className="flex items-center gap-3 text-[11px] text-cyan-400">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            {t.galaxyFooterStatus}
-          </span>
-          <span>•</span>
-          <span>{t.galaxyLatency}</span>
-        </div>
-      </footer>
 
     </div>
   );
