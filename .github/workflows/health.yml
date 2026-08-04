@@ -1,0 +1,34 @@
+name: Uptime Health Check
+
+on:
+  schedule:
+    # Every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  health:
+    name: Ping production /api/health
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit production health endpoint
+        id: health
+        run: |
+          CODE=$(curl -s -o /tmp/health.json -w '%{http_code}' \
+            https://mahmoud-wehaiba-portfolio.vercel.app/api/health)
+          echo "status_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "body=$(cat /tmp/health.json)" >> "$GITHUB_OUTPUT"
+          if [ "$CODE" != "200" ]; then
+            echo "Health check FAILED with HTTP $CODE" >&2
+            exit 1
+          fi
+          echo "Health check OK."
+
+      - name: Report failure to Discord
+        if: failure() && env.DISCORD_WEBHOOK
+        run: |
+          curl -s -H 'Content-Type: application/json' \
+            -d "{\"content\":\":rotating_light: Portfolio /api/health is DOWN or degraded at $(date -u).\"}" \
+            "$DISCORD_WEBHOOK" || true
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}

@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getAdminPasskey } from '../_util';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,10 +14,10 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || 'admin123';
-  const { passkey } = req.body;
+  const body = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, unknown>;
+  const { passkey } = body;
 
-  if (passkey === ADMIN_PASSKEY) {
+  if (passkey === getAdminPasskey()) {
     return res.status(200).json({ success: true, message: 'Admin access granted' });
   } else {
     return res.status(401).json({ success: false, error: 'Invalid Admin Passkey' });

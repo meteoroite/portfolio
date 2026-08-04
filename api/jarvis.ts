@@ -1,4 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createRateLimiter, sanitizeText } from './_util';
+
+// Protect the Gemini quota: max 15 requests / minute per IP.
+const rateLimit = createRateLimiter({ windowMs: 60000, max: 15 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,8 +17,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  if (!rateLimit(req)) {
+    return res.status(429).json({ reply: 'JARVIS is receiving too many transmissions. Please wait a moment and try again.' });
+  }
+
   try {
-    const { message, conversationHistory } = req.body;
+    const body = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, unknown>;
+    const message = sanitizeText(body.message, 2000);
+    const conversationHistory = Array.isArray(body.conversationHistory) ? body.conversationHistory : [];
 
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'Message string is required.' });

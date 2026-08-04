@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { PERSONAL_INFO, PROJECTS_DATA, INITIAL_POSTS_DATA } from '../src/data/profileData';
+import { PERSONAL_INFO, PROJECTS_DATA, INITIAL_POSTS_DATA } from './_data';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
