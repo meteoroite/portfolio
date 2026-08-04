@@ -9,11 +9,11 @@ interface RecruiterBannerProps {
 export const RecruiterBanner: React.FC<RecruiterBannerProps> = ({ onDisableRecruiterMode }) => {
   const { t } = useLang();
   return (
-    <div className="bg-emerald-950/80 border-b border-emerald-500/40 text-emerald-200 px-4 py-2 text-xs md:text-sm font-mono flex items-center justify-between gap-3 shadow-md backdrop-blur-md z-50 relative">
-      <div className="flex items-center gap-2">
+    <div className="bg-emerald-950/80 border-b border-emerald-500/40 text-emerald-200 px-4 py-2 text-xs md:text-sm font-mono flex items-center justify-between gap-3 shadow-md backdrop-blur-md z-30 relative">
+      <div className="flex items-center gap-2 min-w-0">
         <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-        <span>
-          <strong className="text-white">{t.recruiterFastView}</strong> {t.recruiterDesc}
+        <span className="truncate">
+          <strong className="text-white">{t.recruiterFastView}</strong> <span className="hidden sm:inline">{t.recruiterDesc}</span>
         </span>
       </div>
 

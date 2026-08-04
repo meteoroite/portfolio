@@ -79,10 +79,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Floating Nexus Toggle Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-1/2 -translate-y-1/2 z-50 group"
-        style={{ left: isOpen ? '280px' : '0px' }}
+        className="fixed top-1/2 -translate-y-1/2 z-[60] group"
         animate={{ 
-          left: isOpen ? 280 : 0,
+          left: isOpen ? 'min(280px, 75vw)' : '0px',
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         whileHover={{ x: 4 }}
@@ -105,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[55] lg:hidden"
             onClick={() => setIsOpen(false)}
           />
         )}
@@ -119,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed top-0 left-0 z-50 h-full w-[280px] bg-[#050608]/98 backdrop-blur-2xl border-r border-slate-800/80 flex flex-col font-mono overflow-y-auto"
+            className="fixed top-0 left-0 z-[60] h-full w-[min(280px,75vw)] bg-[#050608]/98 backdrop-blur-2xl border-r border-slate-800/80 flex flex-col font-mono overflow-y-auto"
             style={{ 
               boxShadow: '4px 0 40px rgba(6, 182, 212, 0.08), 0 0 80px rgba(0, 0, 0, 0.5)' 
             }}

@@ -70,11 +70,11 @@ const COSMIC_RIDDLES: Riddle[] = [
 ];
 
 const SECRET_POSITIONS = [
-  { top: '82%', left: '88%' },
-  { top: '18%', left: '82%' },
-  { top: '75%', left: '8%' },
-  { top: '22%', left: '12%' },
-  { top: '88%', left: '48%' },
+  { top: '82%', left: '85%' },
+  { top: '18%', left: '80%' },
+  { top: '70%', left: '15%' },
+  { top: '25%', left: '75%' },
+  { top: '85%', left: '50%' },
 ];
 
 export const ObserverSecretEye: React.FC = () => {
@@ -154,7 +154,7 @@ export const ObserverSecretEye: React.FC = () => {
           position: 'fixed',
           top: isUnlocked ? 'calc(100vh - 4.5rem)' : currentPos.top,
           left: isUnlocked ? 'calc(100vw - 4.25rem)' : `clamp(1rem, ${currentPos.left}, calc(100vw - 4.25rem))`,
-          zIndex: 45,
+          zIndex: 52,
         }}
         onClick={handleEyeClick}
         className="cursor-pointer group select-none"
@@ -203,7 +203,7 @@ export const ObserverSecretEye: React.FC = () => {
       {/* Cosmic Telepathic Riddle Overlay Modal */}
       <AnimatePresence>
         {showRiddleModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md font-mono animate-fade-in">
+          <div className="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md font-mono animate-fade-in">
             <div className="bg-slate-900 border border-cyan-500/50 rounded-2xl max-w-xl w-full p-6 sm:p-8 space-y-6 shadow-[0_0_60px_rgba(6,182,212,0.3)] relative max-h-[90vh] overflow-y-auto">
               
               {/* Close Button */}

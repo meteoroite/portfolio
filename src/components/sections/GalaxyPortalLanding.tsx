@@ -207,7 +207,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#050608] text-white font-mono flex flex-col justify-between overflow-y-auto overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
+    <div className="fixed inset-0 z-[58] bg-[#050608] text-white font-mono flex flex-col justify-between overflow-y-auto overflow-x-hidden selection:bg-cyan-500 selection:text-slate-950">
       
       {/* Background Interactive Galaxy Canvas */}
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />

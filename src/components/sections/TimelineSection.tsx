@@ -86,14 +86,14 @@ export const TimelineSection: React.FC = () => {
       </motion.div>
 
       {/* Timeline Steps */}
-      <div className="relative border-l-2 border-cyan-500/30 ml-4 sm:ml-8 space-y-10 pl-6 sm:pl-10 my-6">
+      <div className="relative border-l-2 border-cyan-500/30 ml-6 sm:ml-8 space-y-10 pl-6 sm:pl-10 my-6">
         {TIMELINE_DATA.map((item, idx) => {
           const IconComponent = getMilestoneIcon(item.type);
           return (
             <motion.div variants={itemVariants} key={idx} className="relative group">
               
               {/* Node Bullet Icon */}
-              <div className="absolute -left-[31px] sm:-left-[47px] top-1.5 w-10 h-10 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.3)] group-hover:scale-110 transition-transform z-10">
+              <div className="absolute -left-[33px] sm:-left-[49px] top-1.5 w-10 h-10 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.3)] group-hover:scale-110 transition-transform z-10">
                 <IconComponent className="w-5 h-5" />
               </div>
 

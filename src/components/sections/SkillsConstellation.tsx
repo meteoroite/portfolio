@@ -117,7 +117,7 @@ export const SkillsConstellation: React.FC = () => {
         </div>
 
         {/* Category Filter Tabs */}
-        <div className="flex overflow-x-auto max-w-full pb-1 gap-2 pt-2 border-t border-slate-800/80 font-mono text-xs relative z-10 scrollbar-none flex-nowrap sm:flex-wrap">
+        <div className="flex overflow-x-auto max-w-full pb-1 gap-2 pt-2 border-t border-slate-800/80 font-mono text-xs relative z-10 scrollbar-none flex-nowrap sm:flex-wrap scroll-touch">
           <button
             onClick={() => setSelectedCategory('all')}
             className={`px-3 py-1.5 rounded-lg border transition-all whitespace-nowrap shrink-0 ${

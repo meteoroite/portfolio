@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { PROJECTS_DATA } from '../../data/profileData';
@@ -60,10 +60,26 @@ export const ProjectUniverse: React.FC = () => {
   const [divingProject, setDivingProject] = useState<Project | null>(null);
   const [isDiving, setIsDiving] = useState<boolean>(false);
   const [activeModalProject, setActiveModalProject] = useState<Project | null>(null);
+  const diveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Escape key to cancel diving animation or close modal
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isDiving) {
+          cancelDive();
+        } else if (activeModalProject) {
+          setActiveModalProject(null);
+        }
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isDiving, activeModalProject]);
 
   const fetchProjects = async () => {
     try {
@@ -89,7 +105,7 @@ export const ProjectUniverse: React.FC = () => {
     setIsDiving(true);
 
     // Trigger warp entrance animation sequence
-    setTimeout(() => {
+    diveTimerRef.current = setTimeout(() => {
       setIsDiving(false);
       setActiveModalProject(project);
       confetti({
@@ -99,6 +115,12 @@ export const ProjectUniverse: React.FC = () => {
         colors: ['#06b6d4', '#3b82f6', '#a855f7', '#10b981']
       });
     }, 1400);
+  };
+
+  const cancelDive = () => {
+    if (diveTimerRef.current) clearTimeout(diveTimerRef.current);
+    setIsDiving(false);
+    setDivingProject(null);
   };
 
   const getStatusBadge = (status: string) => {
@@ -158,7 +180,7 @@ export const ProjectUniverse: React.FC = () => {
             </div>
 
             {/* Filter Pills */}
-            <div className="flex overflow-x-auto max-w-full pb-1 gap-1.5 font-mono text-xs scrollbar-none flex-nowrap sm:flex-wrap">
+            <div className="flex overflow-x-auto max-w-full pb-1 gap-1.5 font-mono text-xs scrollbar-none flex-nowrap sm:flex-wrap scroll-touch">
               {categories.map(cat => (
                 <button
                   key={cat}
@@ -185,7 +207,7 @@ export const ProjectUniverse: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center overflow-hidden font-mono"
+            className="fixed inset-0 z-[65] bg-slate-950 flex flex-col items-center justify-center overflow-hidden font-mono"
           >
             {/* Speed Streak Particles */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500/20 via-blue-900/40 to-slate-950 animate-pulse" />
@@ -226,6 +248,14 @@ export const ProjectUniverse: React.FC = () => {
                 [ SPEED: 14.2 km/s ] • [ SHIELD TEMP: 1840°C ] • [ LANDING IN 1.2s ]
               </div>
             </motion.div>
+
+            {/* Cancel Button */}
+            <button
+              onClick={cancelDive}
+              className="absolute top-6 right-6 z-30 px-4 py-2 bg-slate-900/80 hover:bg-slate-800 text-slate-300 text-xs font-mono rounded-xl border border-slate-700 hover:border-slate-600 transition-colors backdrop-blur-md"
+            >
+              ✕ Cancel
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -429,7 +459,7 @@ export const ProjectUniverse: React.FC = () => {
 
       {/* PLANET LANDING CASE STUDY MODAL */}
       {activeModalProject && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in font-mono">
+        <div className="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in font-mono">
           <div className="bg-slate-900 border border-cyan-500/40 rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-[0_0_60px_rgba(6,182,212,0.2)] relative max-h-[90vh] overflow-y-auto">
             
             <button

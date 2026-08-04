@@ -99,7 +99,7 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/70 backdrop-blur-sm animate-fade-in font-mono">
+    <div className="fixed inset-0 z-[70] flex justify-end bg-slate-950/70 backdrop-blur-sm animate-fade-in font-mono">
       <div className="w-full max-w-lg bg-slate-900 border-l border-slate-800 h-full flex flex-col justify-between shadow-2xl relative">
         
         {/* Drawer Header */}
@@ -201,13 +201,13 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
             <HelpCircle className="w-3 h-3 text-cyan-400" />
             <span>{t.jarvisSuggested}</span>
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto">
             {quickPrompts.map((p, pIdx) => (
               <button
                 key={pIdx}
                 onClick={() => handleSendMessage(p)}
                 disabled={loading}
-                className="text-[10px] bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 px-2.5 py-1 rounded-lg border border-slate-800 transition-colors text-left"
+                className="text-[10px] bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 px-2.5 py-1 rounded-lg border border-slate-800 transition-colors text-left line-clamp-1"
               >
                 {p}
               </button>

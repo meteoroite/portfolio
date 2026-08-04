@@ -25,6 +25,22 @@
   scrollbar-color: #0891b2 #0a0e14;
 }
 
+/* iOS momentum scrolling for touch containers */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent horizontal overflow on body */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Ensure fixed elements don't cause horizontal scroll */
+.fixed {
+  max-width: 100vw;
+}
+
 ::selection {
   background: #06b6d4;
   color: #020617;
