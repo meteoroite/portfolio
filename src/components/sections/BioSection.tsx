@@ -77,6 +77,18 @@ export const BioSection: React.FC<BioSectionProps> = ({
           <Planet3D id="bio-header-planet" category="Full-Stack Engineering" size={80} isHovered={true} />
         </div>
 
+        {/* Big Slogan Logo Masthead */}
+        {BRAND_ASSETS.brandEmblem.bioHeader && (
+          <motion.div variants={itemVariants} className="lg:col-span-12 flex justify-center pt-1">
+            <img
+              src={BRAND_ASSETS.brandEmblem.bioHeader}
+              alt={t.bioBrandLogo}
+              className="w-40 sm:w-48 lg:w-60 rounded-2xl object-cover border-2 border-cyan-500/40 shadow-[0_0_45px_rgba(6,182,212,0.35)] hover:scale-105 hover:border-cyan-400/70 transition-all"
+              referrerPolicy="no-referrer"
+            />
+          </motion.div>
+        )}
+
         {/* Left Column: Title, Staff Protocol Badges, Typing Subtitle & Mission */}
         <div className="lg:col-span-7 space-y-6 z-10">
           
@@ -98,16 +110,8 @@ export const BioSection: React.FC<BioSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white font-sans flex items-center gap-3">
-              <span>{PERSONAL_INFO.name}</span>
-              {BRAND_ASSETS.brandEmblem.bioHeader && (
-                <img 
-                  src={BRAND_ASSETS.brandEmblem.bioHeader} 
-                  alt={t.bioBrandLogo} 
-                  className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl border border-cyan-400/50 object-cover shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:scale-110 transition-transform" 
-                  referrerPolicy="no-referrer"
-                />
-              )}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white font-sans">
+              {PERSONAL_INFO.name}
             </h1>
             <div className="text-base sm:text-xl font-mono text-cyan-400 font-semibold min-h-[28px] flex items-center">
               <TypewriterText text={PERSONAL_INFO.title} speed={40} delay={300} />
