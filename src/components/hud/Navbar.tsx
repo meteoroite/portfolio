@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   Layers, 
@@ -12,10 +12,12 @@ import {
   X,
   BookOpen,
   Lock,
-  Orbit
+  Orbit,
+  Globe
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
+import { useLang } from '../../lib/language';
 
 interface NavbarProps {
   activeTab: string;
@@ -35,16 +37,30 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenGalaxyPortal
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const { t, toggleLang, isArabic } = useLang();
+
+  // Secret admin access: press Ctrl+Shift+A
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        setAdminUnlocked(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   const navItems = [
-    { id: 'bio', label: 'Identity', icon: User },
-    { id: 'capabilities', label: 'Capabilities', icon: Layers },
-    { id: 'timeline', label: 'Mission Log', icon: Milestone },
-    { id: 'projects', label: 'Project Universe', icon: FolderGit2 },
-    { id: 'blog', label: 'Articles & Blog', icon: BookOpen },
-    { id: 'cv', label: 'Download Archive', icon: FileText },
-    { id: 'contact', label: 'Contact', icon: Send },
-    { id: 'admin', label: 'Admin Portal', icon: Lock },
+    { id: 'bio', label: t.navIdentity, icon: User },
+    { id: 'capabilities', label: t.navCapabilities, icon: Layers },
+    { id: 'timeline', label: t.navTimeline, icon: Milestone },
+    { id: 'projects', label: t.navProjects, icon: FolderGit2 },
+    { id: 'blog', label: t.navBlog, icon: BookOpen },
+    { id: 'cv', label: t.navCV, icon: FileText },
+    { id: 'contact', label: t.navContact, icon: Send },
+    ...(adminUnlocked ? [{ id: 'admin', label: t.navAdmin, icon: Lock }] : []),
   ];
 
   return (
@@ -104,9 +120,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </nav>
 
-        {/* Action Controls: Galaxy Portal, Recruiter Mode & JARVIS Orb */}
+        {/* Action Controls: Language, Galaxy Portal, Recruiter Mode & JARVIS Orb */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* Language Toggle */}
+          <button
+            onClick={toggleLang}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 hover:border-cyan-500/50 transition-all"
+            title={isArabic ? 'Switch to English' : 'التبديل إلى العربية'}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline font-bold">{isArabic ? 'EN' : 'عربي'}</span>
+          </button>
+
           {/* Galaxy Portal Launch Button */}
           <button
             onClick={onOpenGalaxyPortal}
@@ -114,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Return to Animated Galaxy Portal View"
           >
             <Orbit className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
-            <span className="hidden sm:inline font-bold">Galaxy Map</span>
+            <span className="hidden sm:inline font-bold">{t.navGalaxyMap}</span>
           </button>
 
           {/* Recruiter / Fast View Toggle Button */}
@@ -130,9 +156,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <ShieldCheck className={`w-3.5 h-3.5 ${recruiterMode ? 'text-emerald-400' : 'text-slate-400'}`} />
             <span className="hidden sm:inline font-semibold">
-              {recruiterMode ? 'Recruiter Mode ON' : 'Recruiter Mode'}
+              {recruiterMode ? t.navRecruiterModeOn : t.navRecruiterMode}
             </span>
-            <span className="sm:hidden text-[10px]">Fast View</span>
+            <span className="sm:hidden text-[10px]">{t.navFastView}</span>
           </button>
 
           {/* JARVIS AI Trigger */}
@@ -143,8 +169,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             id="jarvis-trigger-btn"
           >
             <Bot className="w-4 h-4 text-cyan-200 animate-pulse" />
-            <span className="hidden sm:inline font-bold">Ask JARVIS AI</span>
-            <span className="sm:hidden font-bold">JARVIS</span>
+            <span className="hidden sm:inline font-bold">{t.navAskJarvis}</span>
+            <span className="sm:hidden font-bold">{t.navJarvis}</span>
           </button>
 
           {/* Mobile Hamburger Toggle */}
@@ -172,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-center gap-1 active:scale-95 transition-transform min-h-[44px]"
             >
               <Orbit className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
-              <span className="text-[10px] font-bold">Galaxy Map</span>
+              <span className="text-[10px] font-bold">{t.navGalaxyMap}</span>
             </button>
 
             <button
@@ -187,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <ShieldCheck className={`w-4 h-4 ${recruiterMode ? 'text-emerald-400' : 'text-slate-400'}`} />
-              <span className="text-[10px] font-bold">{recruiterMode ? 'Fast View ON' : 'Fast View'}</span>
+              <span className="text-[10px] font-bold">{recruiterMode ? t.navFastViewOn : t.navFastView}</span>
             </button>
 
             <button
@@ -198,7 +224,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white text-center gap-1 active:scale-95 transition-transform min-h-[44px] font-bold"
             >
               <Bot className="w-4 h-4 text-cyan-200 animate-pulse" />
-              <span className="text-[10px]">Ask JARVIS</span>
+              <span className="text-[10px]">{t.navAskJarvis}</span>
             </button>
           </div>
 

@@ -244,10 +244,10 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
       </header>
 
       {/* Main Hero & JARVIS Hologram Centerpiece */}
-      <main className="relative z-20 max-w-5xl mx-auto px-4 py-8 w-full flex flex-col items-center justify-center my-auto space-y-8 text-center">
+      <main className="relative z-20 max-w-5xl mx-auto px-4 py-8 w-full flex flex-col items-center justify-center min-h-screen space-y-8 text-center">
         
         {/* JARVIS AI Avatar Core */}
-        <div className="relative group cursor-pointer" onClick={() => handleTriggerWarp('bio')}>
+        <div className="relative group cursor-pointer flex flex-col items-center" onClick={() => handleTriggerWarp('bio')}>
           <motion.div
             animate={{
               scale: jarvisSpeaking ? [1, 1.12, 1] : [1, 1.05, 1],
@@ -258,12 +258,12 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
               ]
             }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center relative shadow-2xl z-10 overflow-hidden"
+            className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center relative shadow-2xl z-10 overflow-hidden mx-auto"
           >
             <img 
               src={BRAND_ASSETS.jarvisEye.galaxyPortal} 
               alt="JARVIS AI Core" 
-              className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-full"
+              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full"
               referrerPolicy="no-referrer"
             />
             

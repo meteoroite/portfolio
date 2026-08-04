@@ -15,16 +15,26 @@ import { ContactTerminal } from './components/sections/ContactTerminal';
 import { BlogSection } from './components/sections/BlogSection';
 import { AdminDashboard } from './components/sections/AdminDashboard';
 import { JARVISDrawer } from './components/ai/JARVISDrawer';
+import { LanguageProvider, useLang } from './lib/language';
 import { PERSONAL_INFO } from './data/profileData';
 import { BRAND_ASSETS } from './data/brandAssets';
 import { ShieldCheck, Bot, Sparkles, Terminal, Mail, Heart } from 'lucide-react';
 
 export default function App() {
+  return (
+    <LanguageProvider>
+      <AppInner />
+    </LanguageProvider>
+  );
+}
+
+function AppInner() {
   const [showGalaxyPortal, setShowGalaxyPortal] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<string>('bio');
   const [recruiterMode, setRecruiterMode] = useState<boolean>(false);
   const [isJarvisOpen, setIsJarvisOpen] = useState<boolean>(false);
   const [systemReducedMotion, setSystemReducedMotion] = useState<boolean>(false);
+  const { t } = useLang();
 
   useEffect(() => {
     // Detect OS prefers-reduced-motion
@@ -124,15 +134,15 @@ export default function App() {
               referrerPolicy="no-referrer"
             />
             <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span>Mahmoud Wehaiba Portfolio Engine // 2026</span>
+            <span>{t.footerEngine}</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-[11px]">
-            <span>B.Sc. Agricultural Engineering ('24)</span>
+            <span>{t.footerAgri}</span>
             <span>•</span>
-            <span>Full-Stack & AI Systems</span>
+            <span>{t.footerFullstack}</span>
             <span>•</span>
-            <span>Military Service Completed ('26)</span>
+            <span>{t.footerMilitary}</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -141,7 +151,7 @@ export default function App() {
               className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-semibold"
             >
               <Bot className="w-3.5 h-3.5" />
-              <span>Ask JARVIS AI</span>
+              <span>{t.footerAskJarvis}</span>
             </button>
 
             <span>|</span>
@@ -151,7 +161,7 @@ export default function App() {
               className="flex items-center gap-1.5 text-slate-300 hover:text-white"
             >
               <Mail className="w-3.5 h-3.5" />
-              <span>Contact</span>
+              <span>{t.footerContact}</span>
             </button>
           </div>
         </div>
