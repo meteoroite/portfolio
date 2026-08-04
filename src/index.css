@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* Custom Scrollbar — Cyan/Dark Theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0e14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #0891b2, #0e7490);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #22d3ee, #06b6d4);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #0891b2 #0a0e14;
+}
+
+::selection {
+  background: #06b6d4;
+  color: #020617;
+}

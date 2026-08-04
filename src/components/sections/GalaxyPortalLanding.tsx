@@ -258,12 +258,12 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
               ]
             }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center relative shadow-2xl z-10 overflow-hidden mx-auto"
+            className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center relative shadow-2xl z-10 overflow-hidden mx-auto"
           >
             <img 
               src={BRAND_ASSETS.jarvisEye.galaxyPortal} 
               alt="JARVIS AI Core" 
-              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-full"
+              className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-full"
               referrerPolicy="no-referrer"
             />
             
