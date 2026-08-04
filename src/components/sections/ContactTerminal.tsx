@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PERSONAL_INFO } from '../../data/profileData';
+import { useLang } from '../../lib/language';
 import { 
   Terminal, 
   Send, 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export const ContactTerminal: React.FC = () => {
+  const { t } = useLang();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -98,13 +100,13 @@ export const ContactTerminal: React.FC = () => {
       <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 sm:p-8 backdrop-blur-md space-y-2">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono mb-2">
           <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-          <span>DIRECT DISPATCH TERMINAL</span>
+          <span>{t.contactDirectDispatch}</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-          Contact & Collaboration Terminal
+          {t.contactTitle}
         </h2>
         <p className="text-slate-400 text-sm max-w-2xl font-sans">
-          Whether you're hiring for a full-stack/AI role, seeking a freelance technical architect, or exploring AgTech ventures, send a direct encrypted dispatch below.
+          {t.contactDesc}
         </p>
       </div>
 
@@ -132,7 +134,7 @@ export const ContactTerminal: React.FC = () => {
                   )}
                 </div>
                 <div className="text-[11px] text-cyan-400 truncate">
-                  Full-Stack & AI Engineer
+                  {t.contactProfileRole}
                 </div>
                 <div className="text-[10px] text-slate-400">
                   {PERSONAL_INFO.location}
@@ -142,13 +144,13 @@ export const ContactTerminal: React.FC = () => {
 
             <div className="flex items-center gap-2 text-cyan-400 text-sm font-bold uppercase tracking-wider">
               <Mail className="w-4 h-4" />
-              <span>Direct Communication Channel</span>
+              <span>{t.contactDirectLine}</span>
             </div>
 
             {/* Email Copy Card */}
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
               <div className="text-[11px] text-slate-400 uppercase tracking-widest font-semibold">
-                Official Email Address
+                {t.contactEmailLabel}
               </div>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-bold text-slate-100 select-all truncate">
@@ -168,10 +170,10 @@ export const ContactTerminal: React.FC = () => {
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
               <div className="flex items-center gap-2 text-emerald-400 font-bold">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Typical Response Time</span>
+                <span>{t.contactResponseTime}</span>
               </div>
               <p className="text-slate-300 font-sans leading-relaxed">
-                Direct messages sent through this terminal trigger server notifications. Mahmoud responds to all technical and career inquiries within 12-24 hours.
+                {t.contactResponseDesc}
               </p>
             </div>
           </div>
@@ -179,7 +181,7 @@ export const ContactTerminal: React.FC = () => {
           {/* Social Icons */}
           <div className="pt-4 border-t border-slate-800 space-y-3">
             <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-              External Technical Portals
+              {t.contactExternalPortals}
             </div>
             <div className="grid grid-cols-2 gap-3 text-xs">
               <a
@@ -189,7 +191,7 @@ export const ContactTerminal: React.FC = () => {
                 className="flex items-center gap-2 bg-slate-950 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-800 text-slate-200 transition-colors"
               >
                 <GitBranch className="w-4 h-4 text-cyan-400" />
-                <span>GitHub Profile</span>
+                <span>{t.contactGitHub}</span>
               </a>
 
               <a
@@ -199,7 +201,7 @@ export const ContactTerminal: React.FC = () => {
                 className="flex items-center gap-2 bg-slate-950 hover:bg-slate-800 p-2.5 rounded-xl border border-slate-800 text-slate-200 transition-colors"
               >
                 <Globe className="w-4 h-4 text-cyan-400" />
-                <span>LinkedIn Profile</span>
+                <span>{t.contactLinkedIn}</span>
               </a>
             </div>
           </div>
@@ -210,7 +212,7 @@ export const ContactTerminal: React.FC = () => {
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div className="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider">
               <Terminal className="w-4 h-4 text-cyan-400" />
-              <span>TERMINAL DISPATCH INTERFACE</span>
+              <span>{t.contactTerminalInterface}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
@@ -223,7 +225,7 @@ export const ContactTerminal: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs text-slate-400 font-semibold">
-                  Sender Name <span className="text-cyan-400">*</span>
+                  {t.contactSenderName} <span className="text-cyan-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -237,7 +239,7 @@ export const ContactTerminal: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs text-slate-400 font-semibold">
-                  Sender Email <span className="text-cyan-400">*</span>
+                  {t.contactSenderEmail} <span className="text-cyan-400">*</span>
                 </label>
                 <input
                   type="email"
@@ -252,7 +254,7 @@ export const ContactTerminal: React.FC = () => {
 
             <div className="space-y-1">
               <label className="text-xs text-slate-400 font-semibold">
-                Subject / Topic
+                {t.contactSubjectLabel}
               </label>
               <input
                 type="text"
@@ -265,7 +267,7 @@ export const ContactTerminal: React.FC = () => {
 
             <div className="space-y-1">
               <label className="text-xs text-slate-400 font-semibold">
-                Message Body <span className="text-cyan-400">*</span>
+                {t.contactMessageBody} <span className="text-cyan-400">*</span>
               </label>
               <textarea
                 required
@@ -288,7 +290,7 @@ export const ContactTerminal: React.FC = () => {
             {/* Terminal Live Output Window */}
             <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1 text-[10px] text-slate-400 font-mono">
               <div className="text-slate-500 font-bold uppercase tracking-wider">
-                Console Output Log:
+                {t.contactConsoleLog}
               </div>
               {terminalLogs.slice(-3).map((log, lIdx) => (
                 <div key={lIdx} className="text-cyan-400/90 truncate">
@@ -304,7 +306,7 @@ export const ContactTerminal: React.FC = () => {
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 rounded-xl text-xs shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all hover:scale-[1.01] disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
-              <span>{loading ? "Transmitting Dispatch..." : "Dispatch Message to Mahmoud"}</span>
+              <span>{loading ? t.contactTransmitting : t.contactDispatchTo}</span>
             </button>
           </form>
         </div>

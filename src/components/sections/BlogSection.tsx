@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BlogPost, Comment } from '../../types';
 import { Planet3D } from '../ui/Planet3D';
+import { useLang } from '../../lib/language';
 import { 
   BookOpen, 
   Search, 
@@ -44,6 +45,7 @@ const itemVariants = {
 };
 
 export const BlogSection: React.FC = () => {
+  const { t } = useLang();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -158,13 +160,13 @@ export const BlogSection: React.FC = () => {
         <div className="space-y-2 z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono">
             <Orbit className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '10s' }} />
-            <span>ENGINEERING LOGS & CELESTIAL ARTICLES</span>
+            <span>{t.blogEngineeringLogs}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-sans">
-            Technical Insights & Thought Leadership
+            {t.blogTitle}
           </h2>
           <p className="text-slate-400 text-sm max-w-2xl font-sans">
-            In-depth engineering write-ups covering local LLM orchestration, computer vision in precision agriculture, backend clean architecture, and real-time distributed systems.
+            {t.blogDescription}
           </p>
         </div>
 
@@ -172,13 +174,13 @@ export const BlogSection: React.FC = () => {
         <div className="flex items-center gap-4 font-mono text-xs shrink-0 z-10">
           <div className="bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800 text-center">
             <div className="text-cyan-400 font-bold text-lg">{posts.length}</div>
-            <div className="text-slate-500 text-[10px] uppercase">Articles</div>
+            <div className="text-slate-500 text-[10px] uppercase">{t.blogArticles}</div>
           </div>
           <div className="bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800 text-center">
             <div className="text-rose-400 font-bold text-lg">
               {posts.reduce((acc, p) => acc + p.likes, 0)}
             </div>
-            <div className="text-slate-500 text-[10px] uppercase">Likes</div>
+            <div className="text-slate-500 text-[10px] uppercase">{t.blogLikesCount}</div>
           </div>
           <div className="hidden sm:block">
             <Planet3D id="blog-header-planet" category="AI" size={60} isHovered={true} />
@@ -197,7 +199,7 @@ export const BlogSection: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search articles by topic, keyword, or technology tag..."
+              placeholder={t.blogSearchPlaceholder}
               className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors font-sans"
             />
             {searchQuery && (
@@ -233,13 +235,13 @@ export const BlogSection: React.FC = () => {
       {/* Posts Cards Grid */}
       {loading ? (
         <div className="p-12 text-center text-slate-500 font-mono text-xs">
-          Loading articles from API...
+          {t.blogLoading}
         </div>
       ) : filteredPosts.length === 0 ? (
         <div className="p-12 bg-slate-900/40 border border-slate-800 rounded-2xl text-center space-y-2">
           <BookOpen className="w-8 h-8 text-slate-600 mx-auto" />
-          <div className="text-slate-300 font-bold text-sm">No articles matched your criteria</div>
-          <div className="text-slate-500 text-xs">Try clearing your search or tag filters.</div>
+          <div className="text-slate-300 font-bold text-sm">{t.blogNoResults}</div>
+          <div className="text-slate-500 text-xs">{t.blogTryClear}</div>
         </div>
       ) : (
         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -312,7 +314,7 @@ export const BlogSection: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-1 text-cyan-400 text-xs font-semibold group-hover:translate-x-1 transition-transform">
-                  <span>Read Article</span>
+                  <span>{t.blogReadArticle}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </div>
@@ -332,7 +334,7 @@ export const BlogSection: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-3 text-xs font-mono text-cyan-400">
                   <span className="px-2.5 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300">
-                    Published Article
+                    {t.blogPublished}
                   </span>
                   <span>{selectedPost.date}</span>
                   <span>•</span>
@@ -343,7 +345,7 @@ export const BlogSection: React.FC = () => {
                 </h2>
                 <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
                   <User className="w-3.5 h-3.5 text-slate-500" />
-                  <span>By {selectedPost.author}</span>
+                  <span>{t.blogBy} {selectedPost.author}</span>
                 </div>
               </div>
 
@@ -414,11 +416,11 @@ export const BlogSection: React.FC = () => {
                   className="flex items-center gap-2 px-4 py-2 bg-rose-950/60 hover:bg-rose-900/60 border border-rose-500/40 text-rose-200 rounded-xl transition-colors font-bold text-xs"
                 >
                   <Heart className="w-4 h-4 fill-rose-500 text-rose-400 animate-pulse" />
-                  <span>Like Article ({selectedPost.likes})</span>
+                  <span>{t.blogLikeArticle} ({selectedPost.likes})</span>
                 </button>
 
                 <div className="text-xs text-slate-400">
-                  {selectedPost.comments.length} Visitor Comments
+                  {selectedPost.comments.length} {t.blogVisitorComments}
                 </div>
               </div>
 
@@ -426,18 +428,18 @@ export const BlogSection: React.FC = () => {
               <div className="space-y-6 pt-4 border-t border-slate-800">
                 <h4 className="text-sm font-bold text-white font-mono flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-cyan-400" />
-                  <span>Community Reactions & Discussion</span>
+                  <span>{t.blogDiscussion}</span>
                 </h4>
 
                 {/* Comment Form */}
                 <form onSubmit={handleAddComment} className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 font-mono">
-                  <div className="text-xs text-slate-400 font-bold uppercase">Leave a Comment</div>
+                  <div className="text-xs text-slate-400 font-bold uppercase">{t.blogLeaveComment}</div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input
                       type="text"
                       value={commentAuthor}
                       onChange={(e) => setCommentAuthor(e.target.value)}
-                      placeholder="Your Name / Handle (Optional)"
+                      placeholder={t.blogYourName}
                       className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-sans"
                     />
                   </div>
@@ -446,7 +448,7 @@ export const BlogSection: React.FC = () => {
                     rows={2}
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Share your thoughts or technical questions on this article..."
+                    placeholder={t.blogCommentPlaceholder}
                     className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none font-sans"
                   />
                   <div className="flex justify-end">
@@ -456,7 +458,7 @@ export const BlogSection: React.FC = () => {
                       className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
                     >
                       <Send className="w-3.5 h-3.5" />
-                      <span>{submittingComment ? "Posting..." : "Post Comment"}</span>
+                      <span>{submittingComment ? t.blogPosting : t.blogPostComment}</span>
                     </button>
                   </div>
                 </form>
@@ -465,7 +467,7 @@ export const BlogSection: React.FC = () => {
                 <div className="space-y-3">
                   {selectedPost.comments.length === 0 ? (
                     <div className="text-xs text-slate-500 italic font-mono p-4 text-center border border-slate-800/50 rounded-xl">
-                      Be the first visitor to comment on this article!
+                      {t.blogBeFirst}
                     </div>
                   ) : (
                     selectedPost.comments.map((comm) => (

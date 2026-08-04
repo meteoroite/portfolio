@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { JARVISMessage } from '../../types';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
+import { useLang } from '../../lib/language';
 import { 
   Bot, 
   X, 
@@ -20,12 +21,13 @@ interface JARVISDrawerProps {
 }
 
 export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onNavigateToTab }) => {
+  const { t } = useLang();
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<JARVISMessage[]>([
     {
       id: 'welcome',
       sender: 'jarvis',
-      text: "Greetings. I am JARVIS, Mahmoud Wehaiba's AI Assistant. I am grounded directly on his verified engineering knowledge base, skills, projects, and career history. How may I assist your evaluation today?",
+      text: t.jarvisWelcome,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -41,10 +43,10 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
   if (!isOpen) return null;
 
   const quickPrompts = [
-    "What are Mahmoud's primary technical skills?",
-    "Tell me about his Agricultural Engineering background.",
-    "Explain the architecture of the HealthMaster project.",
-    "What roles is Mahmoud currently seeking?"
+    t.jarvisQuery1,
+    t.jarvisQuery2,
+    t.jarvisQuery3,
+    t.jarvisQuery4
   ];
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -87,7 +89,7 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
       const errorMsg: JARVISMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'jarvis',
-        text: "Network error communicating with JARVIS server. Please ensure connection is active.",
+        text: t.jarvisNetworkError,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -117,13 +119,13 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
             </div>
             <div>
               <div className="font-bold text-sm text-white flex items-center gap-2">
-                <span>JARVIS AI Assistant</span>
+                <span>{t.jarvisTitle}</span>
                 <span className="text-[10px] px-2 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
                   Gemini 3.6
                 </span>
               </div>
               <div className="text-[10px] text-slate-400">
-                Grounded Knowledge Base • Mahmoud Wehaiba
+                {t.jarvisGrounded}
               </div>
             </div>
           </div>
@@ -186,7 +188,7 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
           {loading && (
             <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono p-2">
               <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
-              <span>JARVIS query processing...</span>
+              <span>{t.jarvisProcessing}</span>
             </div>
           )}
 
@@ -197,7 +199,7 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
         <div className="p-3 border-t border-slate-800 bg-slate-950/60 space-y-2">
           <div className="flex items-center gap-1.5 text-[10px] text-slate-400 uppercase tracking-widest font-bold">
             <HelpCircle className="w-3 h-3 text-cyan-400" />
-            <span>Suggested Queries</span>
+            <span>{t.jarvisSuggested}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {quickPrompts.map((p, pIdx) => (
@@ -220,7 +222,7 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask JARVIS about Mahmoud..."
+            placeholder={t.jarvisPlaceholder}
             className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-base sm:text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors font-sans"
           />
           <button

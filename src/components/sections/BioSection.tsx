@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
+import { useLang } from '../../lib/language';
 import { EyeEngine } from '../ambient/EyeEngine';
 import { TypewriterText } from '../ui/TypewriterText';
 import { Planet3D } from '../ui/Planet3D';
@@ -54,6 +55,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
   onNavigate,
   onOpenJarvis
 }) => {
+  const { t } = useLang();
   return (
     <motion.div 
       variants={containerVariants}
@@ -86,12 +88,12 @@ export const BioSection: React.FC<BioSectionProps> = ({
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/90 border border-cyan-400/50 text-cyan-300 text-xs font-mono shadow-[0_0_15px_rgba(6,182,212,0.25)]"
             >
               <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
-              <span className="font-bold tracking-wider uppercase">STAFF ARCHITECT & AI ENGINEER PROTOCOL</span>
+              <span className="font-bold tracking-wider uppercase">{t.bioProtocol}</span>
             </motion.div>
 
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-[11px] font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ACTIVE SYSTEM</span>
+              <span>{t.bioActiveSystem}</span>
             </span>
           </div>
 
@@ -101,7 +103,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
               {BRAND_ASSETS.brandEmblem.bioHeader && (
                 <img 
                   src={BRAND_ASSETS.brandEmblem.bioHeader} 
-                  alt="Brand Logo" 
+                  alt={t.bioBrandLogo} 
                   className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl border border-cyan-400/50 object-cover shadow-[0_0_15px_rgba(6,182,212,0.4)] hover:scale-110 transition-transform" 
                   referrerPolicy="no-referrer"
                 />
@@ -121,24 +123,24 @@ export const BioSection: React.FC<BioSectionProps> = ({
             <div className="bg-slate-950/90 p-3 rounded-xl border border-slate-800 flex items-start gap-2.5 hover:border-cyan-500/40 transition-colors">
               <GraduationCap className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <div className="text-slate-200 font-bold">Tanta University '24</div>
-                <div className="text-slate-400 text-[11px]">B.Sc. Agri Engineering</div>
+                <div className="text-slate-200 font-bold">{t.bioTanta}</div>
+                <div className="text-slate-400 text-[11px]">{t.bioAgriEng}</div>
               </div>
             </div>
 
             <div className="bg-slate-950/90 p-3 rounded-xl border border-slate-800 flex items-start gap-2.5 hover:border-cyan-500/40 transition-colors">
               <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
               <div>
-                <div className="text-slate-200 font-bold">Military Service</div>
-                <div className="text-slate-400 text-[11px]">Completed Mar 2026</div>
+                <div className="text-slate-200 font-bold">{t.bioMilitary}</div>
+                <div className="text-slate-400 text-[11px]">{t.bioMilitaryDate}</div>
               </div>
             </div>
 
             <div className="bg-slate-950/90 p-3 rounded-xl border border-slate-800 flex items-start gap-2.5 hover:border-cyan-500/40 transition-colors">
               <Cpu className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
               <div>
-                <div className="text-slate-200 font-bold">Full-Stack & AI</div>
-                <div className="text-slate-400 text-[11px]">React / Node / Ollama / C#</div>
+                <div className="text-slate-200 font-bold">{t.bioFullstackAI}</div>
+                <div className="text-slate-400 text-[11px]">{t.bioFullstackTech}</div>
               </div>
             </div>
           </div>
@@ -150,7 +152,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono text-xs font-bold px-5 py-3 rounded-xl shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all hover:scale-105 min-h-[44px]"
             >
               <Zap className="w-4 h-4" />
-              <span>Explore Projects</span>
+              <span>{t.bioExploreProjects}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -159,7 +161,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
               className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-200 font-mono text-xs px-4 py-3 rounded-xl border border-slate-700 hover:border-cyan-500/50 transition-all min-h-[44px]"
             >
               <Layers className="w-4 h-4 text-cyan-400" />
-              <span>Skills & Tech Stack</span>
+              <span>{t.bioSkillsTechStack}</span>
             </button>
 
             <button
@@ -167,7 +169,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
               className="flex items-center justify-center gap-2 bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 font-mono text-xs px-4 py-3 rounded-xl border border-cyan-500/50 transition-all hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] min-h-[44px]"
             >
               <Terminal className="w-4 h-4 text-cyan-400" />
-              <span>Ask JARVIS AI</span>
+              <span>{t.bioAskJarvis}</span>
             </button>
           </div>
         </div>
@@ -203,7 +205,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
                   <span className="text-white font-bold text-[11px] truncate">Mahmoud Wehaiba</span>
                 </div>
                 <span className="text-[10px] text-cyan-400 font-bold bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/30">
-                  STAFF ARCHITECT
+                  {t.bioStaffArchitect}
                 </span>
               </div>
             </div>
@@ -214,7 +216,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
           <div className="pt-2 border-t border-slate-800/80 w-full flex flex-col items-center">
             <div className="text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5">
               <Activity className="w-3 h-3 text-cyan-400" />
-              <span>AI Observer Core & Visual Tracker</span>
+              <span>{t.bioAiObserver}</span>
             </div>
             <EyeEngine reducedMotion={reducedMotion} onEyeClick={onOpenJarvis} />
           </div>
@@ -231,7 +233,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
         >
           <div className="flex items-center gap-2 text-cyan-400 text-sm font-bold uppercase tracking-wider">
             <CheckCircle2 className="w-4 h-4" />
-            <span>Core Engineering Values</span>
+            <span>{t.bioCoreEngValues}</span>
           </div>
 
           <ul className="space-y-3">
@@ -252,7 +254,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold uppercase tracking-wider">
               <Globe className="w-4 h-4" />
-              <span>Vision & Long-Term Direction</span>
+              <span>{t.bioVision}</span>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
@@ -289,7 +291,7 @@ export const BioSection: React.FC<BioSectionProps> = ({
               className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 transition-colors"
             >
               <Mail className="w-4 h-4" />
-              <span>Send Direct Message</span>
+              <span>{t.bioSendMessage}</span>
             </button>
           </div>
         </motion.div>

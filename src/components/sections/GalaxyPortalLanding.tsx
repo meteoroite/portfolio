@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { TypewriterText } from '../ui/TypewriterText';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
+import { useLang } from '../../lib/language';
 import { 
   Orbit, 
   Sparkles, 
@@ -27,6 +28,7 @@ interface GalaxyPortalLandingProps {
 }
 
 export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnterGalaxy }) => {
+  const { t } = useLang();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isWarping, setIsWarping] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState<string>('bio');
@@ -34,8 +36,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
   const [jarvisSpeaking, setJarvisSpeaking] = useState(false);
 
   // JARVIS Welcome Script
-  const jarvisWelcomeMessage = 
-    `Greetings, Explorer. You have arrived at the event horizon of Mahmoud Wehaiba — Staff Architect & AI Engineer. Ahead lies a galaxy of autonomous multi-agent networks, real-time computer vision, and resilient full-stack systems. Prepare for full quantum immersion.`;
+  const jarvisWelcomeMessage = t.galaxyWelcome;
 
   // Handle Speech Synthesis
   useEffect(() => {
@@ -197,12 +198,12 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
   };
 
   const celestialDestinations = [
-    { id: 'bio', label: 'Core Identity', desc: 'Staff Architect Protocol', icon: Orbit, planetColor: 'from-cyan-400 to-blue-600' },
-    { id: 'projects', label: 'Project Planets', desc: 'Interactive AI & CRM Systems', icon: FolderGit2, planetColor: 'from-purple-400 to-indigo-700' },
-    { id: 'capabilities', label: 'Skill Constellations', desc: 'Tech Stack & Framework Nodes', icon: Layers, planetColor: 'from-emerald-400 to-teal-700' },
-    { id: 'timeline', label: 'Time Warp Logs', desc: 'University & Military Milestones', icon: Milestone, planetColor: 'from-amber-400 to-orange-600' },
-    { id: 'cv', label: 'Holo Archive', desc: 'Executive & Technical CV Downloads', icon: FileText, planetColor: 'from-blue-400 to-cyan-700' },
-    { id: 'contact', label: 'Sub-Space Link', desc: 'Direct Direct Transmission', icon: Send, planetColor: 'from-fuchsia-400 to-pink-600' },
+    { id: 'bio', label: t.galaxyCoreIdentity, desc: t.galaxyCoreIdentityDesc, icon: Orbit, planetColor: 'from-cyan-400 to-blue-600' },
+    { id: 'projects', label: t.galaxyProjectPlanets, desc: t.galaxyProjectPlanetsDesc, icon: FolderGit2, planetColor: 'from-purple-400 to-indigo-700' },
+    { id: 'capabilities', label: t.galaxySkillConstellations, desc: t.galaxySkillConstellationsDesc, icon: Layers, planetColor: 'from-emerald-400 to-teal-700' },
+    { id: 'timeline', label: t.galaxyTimeWarpLogs, desc: t.galaxyTimeWarpLogsDesc, icon: Milestone, planetColor: 'from-amber-400 to-orange-600' },
+    { id: 'cv', label: t.galaxyHoloArchive, desc: t.galaxyHoloArchiveDesc, icon: FileText, planetColor: 'from-blue-400 to-cyan-700' },
+    { id: 'contact', label: t.galaxySubSpaceLink, desc: t.galaxySubSpaceLinkDesc, icon: Send, planetColor: 'from-fuchsia-400 to-pink-600' },
   ];
 
   return (
@@ -222,10 +223,10 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
             )}
           </div>
           <div>
-            <div className="font-bold text-sm tracking-wider text-white">MAHMOUD WEHAIBA GALAXY</div>
+            <div className="font-bold text-sm tracking-wider text-white">{t.galaxySystem}</div>
             <div className="text-[10px] text-cyan-400 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              <span>COSMIC EVENT HORIZON v3.6</span>
+              <span>{t.galaxyVersion}</span>
             </div>
           </div>
         </div>
@@ -239,7 +240,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
           className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-xs transition-all shadow-md"
         >
           {speechEnabled ? <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
-          <span>{speechEnabled ? "JARVIS Audio: ON" : "JARVIS Audio: OFF"}</span>
+            <span>{speechEnabled ? t.galaxyAudioOn : t.galaxyAudioOff}</span>
         </button>
       </header>
 
@@ -275,7 +276,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
           {/* JARVIS Status Tag */}
           <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/90 border border-cyan-400/50 text-cyan-300 text-[11px] font-bold shadow-md">
             <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
-            <span>JARVIS COSMIC WELCOMER</span>
+            <span>{t.galaxyJarvisTag}</span>
           </div>
         </div>
 
@@ -284,10 +285,10 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
           <div className="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800 pb-3">
             <span className="flex items-center gap-2 text-cyan-400 font-bold">
               <Terminal className="w-4 h-4" />
-              <span>JARVIS TRANSMISSION #001</span>
+              <span>{t.galaxyTransmission}</span>
             </span>
             <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-2.5 py-0.5 rounded border border-emerald-500/30">
-              LIVE SIGNAL
+              {t.galaxyLiveSignal}
             </span>
           </div>
 
@@ -298,13 +299,13 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs">
             <div className="text-slate-400 flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Staff Architect • Tanta University '24 • AI Systems</span>
+              <span>{t.galaxyStaffInfo}</span>
             </div>
             <button
               onClick={() => handleTriggerWarp('bio')}
               className="text-cyan-300 hover:text-white font-bold flex items-center gap-1.5 transition-colors"
             >
-              <span>Explore Direct Core</span>
+              <span>{t.galaxyExploreCore}</span>
               <ArrowRight className="w-4 h-4 text-cyan-400" />
             </button>
           </div>
@@ -318,7 +319,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
             className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-sm sm:text-base shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-all transform hover:scale-105 active:scale-95"
           >
             <Rocket className="w-5 h-5 animate-bounce text-cyan-200" />
-            <span>{isWarping ? "INITIATING HYPER-WARP DIVE..." : "ENTER THE GALAXY"}</span>
+            <span>{isWarping ? t.galaxyWarping : t.galaxyEnter}</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -327,7 +328,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
         <div className="pt-6 w-full max-w-4xl space-y-3">
           <div className="text-xs text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
             <Compass className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
-            <span>Select Celestial Destination System</span>
+            <span>{t.galaxySelectDest}</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
@@ -360,15 +361,15 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
       {/* Footer System Status */}
       <footer className="relative z-20 max-w-7xl mx-auto w-full p-4 sm:p-6 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-slate-900">
         <div>
-          Mahmoud Wehaiba © {new Date().getFullYear()} • Autonomous AI Architecture
+          Mahmoud Wehaiba © {new Date().getFullYear()} • {t.galaxyFooter}
         </div>
         <div className="flex items-center gap-3 text-[11px] text-cyan-400">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            GALAXY GRID ACTIVE
+            {t.galaxyFooterStatus}
           </span>
           <span>•</span>
-          <span>LATENCY: 12ms</span>
+          <span>            {t.galaxyLatency}</span>
         </div>
       </footer>
 

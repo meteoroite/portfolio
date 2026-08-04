@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { TIMELINE_DATA } from '../../data/profileData';
 import { Planet3D } from '../ui/Planet3D';
+import { useLang } from '../../lib/language';
 import { 
   Milestone, 
   GraduationCap, 
@@ -34,6 +35,7 @@ const itemVariants = {
 };
 
 export const TimelineSection: React.FC = () => {
+  const { t } = useLang();
   const getMilestoneIcon = (type: string) => {
     switch (type) {
       case 'education': return GraduationCap;
@@ -68,13 +70,13 @@ export const TimelineSection: React.FC = () => {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono mb-2">
             <Orbit className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '10s' }} />
-            <span>COSMIC TIMELINE & ROADMAP</span>
+            <span>{t.timelineCosmic}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-            Chronological Career & Systems Roadmap
+            {t.timelineTitle}
           </h2>
           <p className="text-slate-400 text-sm max-w-2xl font-sans mt-1">
-            From self-taught programming fundamentals in 2016 to graduating with an Agricultural Engineering degree in 2024, completing military service in 2026, and launching AI software platforms today.
+            {t.timelineDesc}
           </p>
         </div>
 
@@ -136,7 +138,7 @@ export const TimelineSection: React.FC = () => {
                 {item.highlights.length > 0 && (
                   <div className="pt-3 border-t border-slate-800/80 space-y-2">
                     <div className="text-xs font-mono text-slate-400 uppercase tracking-wider font-semibold">
-                      Key Accomplishments & Milestones:
+                      {t.timelineAccomplishments}
                     </div>
                     <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-300">
                       {item.highlights.map((h, hIdx) => (

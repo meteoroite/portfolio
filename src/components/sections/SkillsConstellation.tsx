@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SKILL_CATEGORIES } from '../../data/profileData';
 import { SkillCategory } from '../../types';
 import { Planet3D } from '../ui/Planet3D';
+import { useLang } from '../../lib/language';
 import { 
   Code2, 
   Server, 
@@ -39,6 +40,7 @@ const itemVariants = {
 };
 
 export const SkillsConstellation: React.FC = () => {
+  const { t } = useLang();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -90,13 +92,13 @@ export const SkillsConstellation: React.FC = () => {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-mono mb-2">
                 <Orbit className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '10s' }} />
-                <span>CELESTIAL CAPABILITIES SECTOR</span>
+                <span>{t.skillsCelestial}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-                Technical Stack & Skill Domains
+                {t.skillsTitle}
               </h2>
               <p className="text-slate-400 text-sm mt-1 max-w-2xl font-sans">
-                Comprehensive overview of languages, backend frameworks, AI orchestration frameworks, databases, and infrastructure tools honed across 8+ years of hands-on software development.
+                {t.skillsDescription}
               </p>
             </div>
           </div>
@@ -108,7 +110,7 @@ export const SkillsConstellation: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search skill (e.g. React, Docker, Python)..."
+              placeholder={t.skillsSearchPlaceholder}
               className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
             />
           </div>
@@ -124,7 +126,7 @@ export const SkillsConstellation: React.FC = () => {
                 : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
           >
-            All Categories ({SKILL_CATEGORIES.reduce((acc, c) => acc + c.skills.length, 0)})
+            {t.skillsAllCategories} ({SKILL_CATEGORIES.reduce((acc, c) => acc + c.skills.length, 0)})
           </button>
 
           {SKILL_CATEGORIES.map(cat => (
@@ -186,7 +188,7 @@ export const SkillsConstellation: React.FC = () => {
 
                     {skill.years && (
                       <div className="text-[11px] font-mono text-slate-500 pt-1 border-t border-slate-900 flex items-center justify-between">
-                        <span>Experience</span>
+                        <span>{t.skillsExperience}</span>
                         <span className="text-slate-300">{skill.years}</span>
                       </div>
                     )}
