@@ -45,9 +45,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
       const timer = setTimeout(() => {
         try {
           window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(
-            "Greetings Explorer. You have arrived at the event horizon of Mahmoud Wehaiba. Prepare to witness autonomous AI networks and full-stack architecture."
-          );
+          const utterance = new SpeechSynthesisUtterance(t.galaxySpeech);
           utterance.rate = 1.0;
           utterance.pitch = 0.9;
           utterance.onstart = () => setJarvisSpeaking(true);
@@ -66,7 +64,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
         }
       };
     }
-  }, [speechEnabled]);
+  }, [speechEnabled, t.galaxySpeech]);
 
   // Spiral Galaxy Canvas Animation
   useEffect(() => {
@@ -240,7 +238,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
           className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-xs transition-all shadow-md"
         >
           {speechEnabled ? <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
-            <span>{speechEnabled ? t.galaxyAudioOn : t.galaxyAudioOff}</span>
+            <span className="hidden sm:inline">{speechEnabled ? t.galaxyAudioOn : t.galaxyAudioOff}</span>
         </button>
       </header>
 
@@ -369,7 +367,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
             {t.galaxyFooterStatus}
           </span>
           <span>•</span>
-          <span>            {t.galaxyLatency}</span>
+          <span>{t.galaxyLatency}</span>
         </div>
       </footer>
 

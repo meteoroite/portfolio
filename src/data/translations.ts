@@ -18,6 +18,9 @@ export const translations = {
     navFastViewOn: 'Fast View ON',
     navAskJarvis: 'Ask JARVIS AI',
     navJarvis: 'JARVIS',
+    navSection: 'Navigation',
+    navControls: 'Controls',
+    navMenuLabel: 'MENU',
 
     // Galaxy Portal
     galaxyWelcome: 'Greetings, Explorer. You have arrived at the event horizon of Mahmoud Wehaiba — Staff Architect & AI Engineer. Ahead lies a galaxy of autonomous multi-agent networks, real-time computer vision, and resilient full-stack systems. Prepare for full quantum immersion.',
@@ -45,6 +48,7 @@ export const translations = {
     galaxyLatency: 'LATENCY: 12ms',
     galaxyAudioOn: 'JARVIS Audio: ON',
     galaxyAudioOff: 'JARVIS Audio: OFF',
+    galaxySpeech: 'Greetings Explorer. You have arrived at the event horizon of Mahmoud Wehaiba. Prepare to witness autonomous AI networks and full-stack architecture.',
 
     // Bio Section
     bioProtocol: 'STAFF ARCHITECT & AI ENGINEER PROTOCOL',
@@ -118,6 +122,11 @@ export const translations = {
     observerEducation: 'Education:',
     observerSpec: 'Specialization:',
     observerKeySystems: 'Key Systems:',
+    observerHint: 'Hint:',
+    observerChallenge: 'COSMIC RIDDLE CHALLENGE',
+    observerCoreArchive: 'OBSERVER CORE: UNLOCKED ARCHIVE',
+    observerAllSolved: '🎉 ALL RIDDLES SOLVED! OBSERVER CORE UNLOCKED & ANCHORED AS YOUR AI GUIDE!',
+    observerWrong: "Incorrect frequency! Try again or consult Mahmoud's Mission Log.",
 
     // Recruiter Banner
     recruiterBanner: 'RECRUITER FAST VIEW ACTIVE — Animations disabled for quick scanning. Toggle off to restore full experience.',
@@ -305,6 +314,9 @@ export const translations = {
     navFastViewOn: 'عرض سريع مفعّل',
     navAskJarvis: 'اسأل جارفس',
     navJarvis: 'جارفس',
+    navSection: 'التنقل',
+    navControls: 'التحكم',
+    navMenuLabel: 'قائمة',
 
     // Galaxy Portal
     galaxyWelcome: 'مرحباً، أيها المستكشف. لقد وصلت إلى أفق الحدث الخاص بمحمود وهيبة — المعماري الأول ومهندس الذكاء الاصطناعي. أمامك مجرة من شبكات الوكيل المتعددة المستقلة، ورؤية الحاسوب في الوقت الفعلي، وأنظمة متكاملة مرنة. استعد للانغماس الكمي الكامل.',
@@ -319,7 +331,7 @@ export const translations = {
     galaxyCoreIdentityDesc: 'بروتوكول المعماري الأول',
     galaxyProjectPlanets: 'كواكب المشاريع',
     galaxyProjectPlanetsDesc: 'أنظمة ذكية وتفاعلية',
-    galaxySkillConstellations: ' tưلزات المهارات',
+    galaxySkillConstellations: 'كوكبات المهارات',
     galaxySkillConstellationsDesc: 'عقد التقنيات والأطر',
     galaxyTimeWarpLogs: 'سجلات تحمل الزمن',
     galaxyTimeWarpLogsDesc: 'إنجازات الجامعة والخدمة العسكرية',
@@ -332,6 +344,7 @@ export const translations = {
     galaxyLatency: 'زمن الاستجابة: ١٢ مللي ثانية',
     galaxyAudioOn: 'صوت جارفس: مفعّل',
     galaxyAudioOff: 'صوت جارفس: معطّل',
+    galaxySpeech: 'مرحباً أيها المستكشف. لقد وصلت إلى أفق الحدث الخاص بمحمود وهيبة. استعد لمشاهدة شبكات الذكاء الاصطناعي المستقلة والبنية البرمجية الكاملة.',
 
     // Bio Section
     bioProtocol: 'بروتوكول المعماري الأول ومهندس الذكاء الاصطناعي',
@@ -405,6 +418,11 @@ export const translations = {
     observerEducation: 'التعليم:',
     observerSpec: 'التخصص:',
     observerKeySystems: 'الأنظمة الرئيسية:',
+    observerHint: 'تلميح:',
+    observerChallenge: 'تحدي اللغز الكوني',
+    observerCoreArchive: 'نواة المراقب: الأرشيف المفتوح',
+    observerAllSolved: '🎉 تم حل جميع الألغاز! نواة المراقب مفتوحة ومثبتة كمرشدك الذكي!',
+    observerWrong: 'تردد خاطئ! حاول مجدداً أو راجع سجل مهمات محمود.',
 
     // Recruiter Banner
     recruiterBanner: 'عرض الموارد البشرية السريع مفعّل — تم تعطيل الرسوم المتحركة للمسح السريع. أغلقه لاستعادة التجربة الكاملة.',

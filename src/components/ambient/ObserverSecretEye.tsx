@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
+import { useLang } from '../../lib/language';
 import { 
   Eye, 
   Sparkles, 
@@ -85,6 +86,7 @@ export const ObserverSecretEye: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; isError: boolean } | null>(null);
   const [teleportEffect, setTeleportEffect] = useState(false);
+  const { t } = useLang();
 
   const currentRiddle = COSMIC_RIDDLES[currentRiddleIdx];
 
@@ -125,7 +127,7 @@ export const ObserverSecretEye: React.FC = () => {
           // Solved all riddles!
           setIsUnlocked(true);
           setFeedbackMsg({
-            text: "🎉 ALL RIDDLES SOLVED! OBSERVER CORE UNLOCKED & ANCHORED AS YOUR AI GUIDE!",
+            text: t.observerAllSolved,
             isError: false
           });
         }
@@ -133,7 +135,7 @@ export const ObserverSecretEye: React.FC = () => {
 
     } else {
       setFeedbackMsg({
-        text: "Incorrect frequency! Try again or consult Mahmoud's Mission Log.",
+        text: t.observerWrong,
         isError: true
       });
     }
@@ -186,14 +188,14 @@ export const ObserverSecretEye: React.FC = () => {
           {!isUnlocked && (
             <div className="absolute -top-7 whitespace-nowrap bg-cyan-950 text-cyan-300 border border-cyan-500/50 text-[10px] font-mono px-2 py-0.5 rounded-full shadow-md opacity-90 group-hover:opacity-100 flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-cyan-400" />
-              <span>Observer Eye (Click Me!)</span>
+              <span>{t.observerClickMe}</span>
             </div>
           )}
 
           {isUnlocked && (
             <div className="absolute -top-7 whitespace-nowrap bg-emerald-950 text-emerald-300 border border-emerald-500/50 text-[10px] font-mono px-2 py-0.5 rounded-full shadow-md flex items-center gap-1 font-bold">
               <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-              <span>AI Guide Unlocked</span>
+              <span>{t.observerUnlocked}</span>
             </div>
           )}
 
@@ -226,11 +228,11 @@ export const ObserverSecretEye: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-cyan-400">
-                      {isUnlocked ? "OBSERVER CORE: UNLOCKED ARCHIVE" : `COSMIC RIDDLE CHALLENGE [ ${currentRiddleIdx + 1} / ${COSMIC_RIDDLES.length} ]`}
+                      {isUnlocked ? t.observerCoreArchive : `${t.observerChallenge} [ ${currentRiddleIdx + 1} / ${COSMIC_RIDDLES.length} ]`}
                     </span>
                   </div>
                   <h3 className="text-xl font-bold text-white">
-                    {isUnlocked ? "Master Observer Secret Archive" : "Solve the Riddle to Unlock the Observer"}
+                    {isUnlocked ? t.observerArchive : t.observerRiddle}
                   </h3>
                 </div>
               </div>
@@ -241,7 +243,7 @@ export const ObserverSecretEye: React.FC = () => {
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                     <div className="text-[10px] text-slate-500 uppercase flex items-center gap-1.5">
                       <Bot className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>OBSERVER TELEPATHIC PROMPT</span>
+                      <span>{t.observerPrompt}</span>
                     </div>
                     <p className="text-sm font-sans text-slate-200 leading-relaxed font-semibold">
                       "{currentRiddle.question}"
@@ -283,7 +285,7 @@ export const ObserverSecretEye: React.FC = () => {
                   )}
 
                   <div className="text-[11px] text-slate-500 italic">
-                    Hint: {currentRiddle.hint}
+                    {t.observerHint} {currentRiddle.hint}
                   </div>
                 </div>
               )}
@@ -294,30 +296,30 @@ export const ObserverSecretEye: React.FC = () => {
                   <div className="p-4 bg-emerald-950/80 border border-emerald-500/40 rounded-xl text-emerald-200 space-y-1 font-mono">
                     <div className="font-bold text-sm flex items-center gap-2">
                       <Award className="w-4 h-4 text-emerald-400" />
-                      <span>COSMIC ARCHITECT CLEARANCE GRANTED</span>
+                      <span>{t.observerClearance}</span>
                     </div>
                     <p className="text-xs font-sans text-emerald-300/90">
-                      You have proven your knowledge of Mahmoud Wehaiba's universe. The Observer Eye is now anchored and serving as your tactical AI monitor.
+                      {t.observerClearanceDesc}
                     </p>
                   </div>
 
                   <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 font-mono">
                     <div className="text-cyan-400 font-bold flex items-center gap-1.5 text-xs">
                       <Terminal className="w-4 h-4" />
-                      <span>MAHMOUD WEHAIBA TECHNICAL PROFILE RECAP</span>
+                      <span>{t.observerProfileRecap}</span>
                     </div>
                     <ul className="space-y-2 text-slate-300 text-xs font-sans">
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span><strong>Education:</strong> B.Sc. Agricultural Engineering (Honors), Tanta University 2024</span>
+                        <span><strong>{t.observerEducation}</strong> B.Sc. Agricultural Engineering (Honors), Tanta University 2024</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span><strong>Specialization:</strong> Autonomous AI Agents, Real-Time Computer Vision & C# Full-Stack</span>
+                        <span><strong>{t.observerSpec}</strong> Autonomous AI Agents, Real-Time Computer Vision & C# Full-Stack</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span><strong>Key Systems:</strong> AutoCRM Intelligence, MedQR Emergency Pass, HandsOn CV Control</span>
+                        <span><strong>{t.observerKeySystems}</strong> AutoCRM Intelligence, MedQR Emergency Pass, HandsOn CV Control</span>
                       </li>
                     </ul>
                   </div>
@@ -326,7 +328,7 @@ export const ObserverSecretEye: React.FC = () => {
                     onClick={() => setShowRiddleModal(false)}
                     className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-xl font-mono text-xs shadow-lg transition-all"
                   >
-                    Close Observer Panel & Resume Exploration
+                    {t.observerClose}
                   </button>
                 </div>
               )}

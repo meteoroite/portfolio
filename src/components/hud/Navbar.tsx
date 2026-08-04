@@ -14,8 +14,8 @@ import {
   Lock,
   Orbit,
   Globe,
-  ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Menu
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
@@ -87,12 +87,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         whileHover={{ x: 4 }}
         aria-label="Toggle navigation"
       >
-        <div className={`flex items-center justify-center w-8 h-16 rounded-r-xl border border-l-0 transition-all duration-300 ${
+        <div className={`flex flex-col items-center justify-center gap-1 w-9 h-20 rounded-r-xl border border-l-0 transition-all duration-300 ${
           isOpen 
             ? 'bg-slate-900/95 border-slate-700 text-slate-400' 
             : 'bg-slate-900/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.35)]'
         } backdrop-blur-xl`}>
-          {isOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          {isOpen ? (
+            <ChevronLeft className="w-4 h-4" />
+          ) : (
+            <>
+              <Menu className="w-4 h-4" />
+              <span className="text-[8px] font-bold tracking-widest">{t.navMenuLabel}</span>
+            </>
+          )}
         </div>
       </motion.button>
 
@@ -164,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Navigation Items */}
             <nav className="flex-1 p-3 space-y-1">
               <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-3 py-2">
-                Navigation
+                {t.navSection}
               </div>
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -192,7 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Action Controls */}
             <div className="p-3 border-t border-slate-800/60 space-y-2">
               <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-3 py-2">
-                Controls
+                {t.navControls}
               </div>
 
               {/* Language Toggle */}

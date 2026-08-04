@@ -51,6 +51,11 @@ function AppInner() {
 
   const effectiveReducedMotion = systemReducedMotion || recruiterMode;
 
+  // Smooth seamless navigation: always start each tab at the top
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [activeTab]);
+
   return (
     <div className="min-h-screen bg-[#050608] text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950 relative flex flex-col justify-between overflow-x-hidden">
       
