@@ -64,8 +64,8 @@ function AppInner() {
         />
       )}
 
-      {/* Secret Observer Eye AI Guide (Floating Interactive Game) */}
-      <ObserverSecretEye />
+      {/* Secret Observer Eye AI Guide — hidden during Galaxy Portal */}
+      {!showGalaxyPortal && <ObserverSecretEye />}
 
       {/* Ambient Background Grid */}
       <BackgroundGrid reducedMotion={effectiveReducedMotion} />
@@ -78,15 +78,17 @@ function AppInner() {
         <RecruiterBanner onDisableRecruiterMode={() => setRecruiterMode(false)} />
       )}
 
-      {/* Primary Sticky HUD Navigation Bar */}
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        recruiterMode={recruiterMode}
-        setRecruiterMode={setRecruiterMode}
-        onOpenJarvis={() => setIsJarvisOpen(true)}
-        onOpenGalaxyPortal={() => setShowGalaxyPortal(true)}
-      />
+      {/* Primary Sticky HUD Navigation Bar — hidden during Galaxy Portal */}
+      {!showGalaxyPortal && (
+        <Navbar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          recruiterMode={recruiterMode}
+          setRecruiterMode={setRecruiterMode}
+          onOpenJarvis={() => setIsJarvisOpen(true)}
+          onOpenGalaxyPortal={() => setShowGalaxyPortal(true)}
+        />
+      )}
 
       {/* Main View Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 z-10 w-full flex-1">
