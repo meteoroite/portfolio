@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   User, 
   Layers, 
@@ -8,12 +9,13 @@ import {
   Send, 
   Bot, 
   ShieldCheck, 
-  Menu, 
   X,
   BookOpen,
   Lock,
   Orbit,
-  Globe
+  Globe,
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
@@ -36,7 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenJarvis,
   onOpenGalaxyPortal
 }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const { t, toggleLang, isArabic } = useLang();
 
@@ -47,6 +49,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         e.preventDefault();
         setAdminUnlocked(prev => !prev);
       }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  // Close sidebar on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -64,197 +75,178 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 text-slate-100 font-mono transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        
-        {/* Brand & System Status */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
-          <button 
-            onClick={() => setActiveTab('bio')}
-            className="flex items-center gap-2 group text-left min-w-0"
-          >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 border border-cyan-500/40 overflow-hidden flex items-center justify-center group-hover:border-cyan-400 transition-all shadow-[0_0_12px_rgba(6,182,212,0.3)] shrink-0">
-              {BRAND_ASSETS.systemIcon.navbarHome ? (
-                <img 
-                  src={BRAND_ASSETS.systemIcon.navbarHome} 
-                  alt="Mahmoud Wehaiba Logo" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <span className="font-bold text-xs sm:text-sm tracking-tighter text-cyan-400">MW</span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold text-xs sm:text-sm tracking-wide text-slate-100 group-hover:text-cyan-400 transition-colors truncate">
-                Mahmoud Wehaiba
-              </div>
-              <div className="text-[9px] sm:text-[10px] text-slate-400 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                <span className="truncate max-w-[90px] xs:max-w-[130px] sm:max-w-xs">{PERSONAL_INFO.statusText.split('&')[0]}</span>
-              </div>
-            </div>
-          </button>
+    <>
+      {/* Floating Nexus Toggle Button */}
+      <motion.button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed top-1/2 -translate-y-1/2 z-50 group"
+        style={{ left: isOpen ? '280px' : '0px' }}
+        animate={{ 
+          left: isOpen ? 280 : 0,
+        }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        whileHover={{ x: 4 }}
+        aria-label="Toggle navigation"
+      >
+        <div className={`flex items-center justify-center w-8 h-16 rounded-r-xl border border-l-0 transition-all duration-300 ${
+          isOpen 
+            ? 'bg-slate-900/95 border-slate-700 text-slate-400' 
+            : 'bg-slate-900/90 border-cyan-500/40 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.35)]'
+        } backdrop-blur-xl`}>
+          {isOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </div>
+      </motion.button>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  isActive
-                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                }`}
-                id={`nav-item-${item.id}`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
+      {/* Overlay backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-        {/* Action Controls: Language, Galaxy Portal, Recruiter Mode & JARVIS Orb */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          
-          {/* Language Toggle */}
-          <button
-            onClick={toggleLang}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 hover:border-cyan-500/50 transition-all"
-            title={isArabic ? 'Switch to English' : 'التبديل إلى العربية'}
+      {/* Sidebar */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.aside
+            initial={{ x: -300, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed top-0 left-0 z-50 h-full w-[280px] bg-[#050608]/98 backdrop-blur-2xl border-r border-slate-800/80 flex flex-col font-mono overflow-y-auto"
+            style={{ 
+              boxShadow: '4px 0 40px rgba(6, 182, 212, 0.08), 0 0 80px rgba(0, 0, 0, 0.5)' 
+            }}
           >
-            <Globe className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline font-bold">{isArabic ? 'EN' : 'عربي'}</span>
-          </button>
-
-          {/* Galaxy Portal Launch Button */}
-          <button
-            onClick={onOpenGalaxyPortal}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-cyan-950/80 hover:bg-cyan-900 text-cyan-300 border border-cyan-500/50 shadow-[0_0_12px_rgba(6,182,212,0.25)] transition-all hover:scale-105"
-            title="Return to Animated Galaxy Portal View"
-          >
-            <Orbit className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
-            <span className="hidden sm:inline font-bold">{t.navGalaxyMap}</span>
-          </button>
-
-          {/* Recruiter / Fast View Toggle Button */}
-          <button
-            onClick={() => setRecruiterMode(!recruiterMode)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all border ${
-              recruiterMode
-                ? 'bg-emerald-950 text-emerald-300 border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-                : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-700 hover:border-slate-600'
-            }`}
-            title="Toggle Recruiter Fast View (Cuts animations for immediate scannable reading)"
-            id="recruiter-mode-toggle"
-          >
-            <ShieldCheck className={`w-3.5 h-3.5 ${recruiterMode ? 'text-emerald-400' : 'text-slate-400'}`} />
-            <span className="hidden sm:inline font-semibold">
-              {recruiterMode ? t.navRecruiterModeOn : t.navRecruiterMode}
-            </span>
-            <span className="sm:hidden text-[10px]">{t.navFastView}</span>
-          </button>
-
-          {/* JARVIS AI Trigger */}
-          <button
-            onClick={onOpenJarvis}
-            className="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-mono shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all hover:scale-105"
-            title="Ask JARVIS AI Assistant about Mahmoud"
-            id="jarvis-trigger-btn"
-          >
-            <Bot className="w-4 h-4 text-cyan-200 animate-pulse" />
-            <span className="hidden sm:inline font-bold">{t.navAskJarvis}</span>
-            <span className="sm:hidden font-bold">{t.navJarvis}</span>
-          </button>
-
-          {/* Mobile Hamburger Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
-            aria-label="Toggle Navigation Menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-800 bg-slate-950/95 px-4 py-4 space-y-3">
-          
-          {/* Mobile Quick System Control Actions */}
-          <div className="grid grid-cols-3 gap-2 pb-2 border-b border-slate-800/80 font-mono text-xs">
-            <button
-              onClick={() => {
-                onOpenGalaxyPortal();
-                setMobileMenuOpen(false);
-              }}
-              className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-center gap-1 active:scale-95 transition-transform min-h-[44px]"
-            >
-              <Orbit className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '8s' }} />
-              <span className="text-[10px] font-bold">{t.navGalaxyMap}</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setRecruiterMode(!recruiterMode);
-                setMobileMenuOpen(false);
-              }}
-              className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center gap-1 active:scale-95 transition-transform min-h-[44px] ${
-                recruiterMode 
-                  ? 'bg-emerald-950 border-emerald-500/60 text-emerald-300 font-bold'
-                  : 'bg-slate-900 border-slate-800 text-slate-300'
-              }`}
-            >
-              <ShieldCheck className={`w-4 h-4 ${recruiterMode ? 'text-emerald-400' : 'text-slate-400'}`} />
-              <span className="text-[10px] font-bold">{recruiterMode ? t.navFastViewOn : t.navFastView}</span>
-            </button>
-
-            <button
-              onClick={() => {
-                onOpenJarvis();
-                setMobileMenuOpen(false);
-              }}
-              className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white text-center gap-1 active:scale-95 transition-transform min-h-[44px] font-bold"
-            >
-              <Bot className="w-4 h-4 text-cyan-200 animate-pulse" />
-              <span className="text-[10px]">{t.navAskJarvis}</span>
-            </button>
-          </div>
-
-          {/* Navigation Items */}
-          <div className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm transition-colors text-left min-h-[44px] ${
-                    isActive
-                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-semibold shadow-sm'
-                      : 'text-slate-300 hover:bg-slate-900 active:bg-slate-800'
-                  }`}
+            {/* Brand Header */}
+            <div className="p-5 border-b border-slate-800/60">
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => { setActiveTab('bio'); setIsOpen(false); }}
+                  className="flex items-center gap-3 group"
                 >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
+                  <div className="w-10 h-10 rounded-xl bg-slate-900 border border-cyan-500/40 overflow-hidden flex items-center justify-center group-hover:border-cyan-400 transition-all shadow-[0_0_12px_rgba(6,182,212,0.25)]">
+                    {BRAND_ASSETS.systemIcon.navbarHome ? (
+                      <img 
+                        src={BRAND_ASSETS.systemIcon.navbarHome} 
+                        alt="Logo" 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span className="font-bold text-sm tracking-tighter text-cyan-400">MW</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-bold text-sm tracking-wide text-slate-100 group-hover:text-cyan-400 transition-colors truncate">
+                      Mahmoud Wehaiba
+                    </div>
+                    <div className="text-[10px] text-slate-400 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                      <span className="truncate">{PERSONAL_INFO.statusText.split('&')[0]}</span>
+                    </div>
+                  </div>
                 </button>
-              );
-            })}
-          </div>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-1.5 text-slate-500 hover:text-slate-300 rounded-lg hover:bg-slate-800/60 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-        </div>
-      )}
-    </header>
+            {/* Navigation Items */}
+            <nav className="flex-1 p-3 space-y-1">
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-3 py-2">
+                Navigation
+              </div>
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => { setActiveTab(item.id); setIsOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all text-left min-h-[44px] ${
+                      isActive
+                        ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                        : 'text-slate-400 hover:bg-slate-900/80 hover:text-slate-200 border border-transparent'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
+                    <span className="font-medium">{item.label}</span>
+                    {isActive && (
+                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Action Controls */}
+            <div className="p-3 border-t border-slate-800/60 space-y-2">
+              <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold px-3 py-2">
+                Controls
+              </div>
+
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLang}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:bg-slate-900/80 hover:text-slate-200 transition-all border border-transparent hover:border-slate-800 min-h-[44px]"
+              >
+                <Globe className="w-4 h-4 text-slate-500 shrink-0" />
+                <span className="font-medium">{isArabic ? 'English' : 'العربية'}</span>
+              </button>
+
+              {/* Galaxy Portal */}
+              <button
+                onClick={() => { onOpenGalaxyPortal(); setIsOpen(false); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-cyan-400 hover:bg-cyan-950/40 transition-all border border-transparent hover:border-cyan-500/30 min-h-[44px]"
+              >
+                <Orbit className="w-4 h-4 animate-spin shrink-0" style={{ animationDuration: '8s' }} />
+                <span className="font-medium">{t.navGalaxyMap}</span>
+              </button>
+
+              {/* Recruiter Mode */}
+              <button
+                onClick={() => setRecruiterMode(!recruiterMode)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all border min-h-[44px] ${
+                  recruiterMode
+                    ? 'bg-emerald-950/40 text-emerald-300 border-emerald-500/40'
+                    : 'text-slate-400 hover:bg-slate-900/80 hover:text-slate-200 border-transparent hover:border-slate-800'
+                }`}
+              >
+                <ShieldCheck className={`w-4 h-4 shrink-0 ${recruiterMode ? 'text-emerald-400' : 'text-slate-500'}`} />
+                <span className="font-medium">{recruiterMode ? t.navRecruiterModeOn : t.navRecruiterMode}</span>
+              </button>
+
+              {/* JARVIS AI */}
+              <button
+                onClick={() => { onOpenJarvis(); setIsOpen(false); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-cyan-600/80 to-blue-600/80 hover:from-cyan-500 hover:to-blue-500 text-white transition-all shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] min-h-[44px]"
+              >
+                <Bot className="w-4 h-4 text-cyan-200 animate-pulse shrink-0" />
+                <span>{t.navAskJarvis}</span>
+              </button>
+            </div>
+
+            {/* Footer Status */}
+            <div className="p-4 border-t border-slate-800/60">
+              <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>SYS: OPERATIONAL</span>
+              </div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
