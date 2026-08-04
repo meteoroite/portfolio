@@ -51,7 +51,8 @@ export const PROJECTS_DATA: Project[] = [
     keyLesson: "Build a rock-solid, testable execution core before layering complex agent memory or multi-modal tools.",
     featured: true,
     role: "Sole AI Architect & Developer",
-    metrics: ["100% Local Privacy", "Sub-second RAG Vector Retrieval", "Async Task Engine"]
+    metrics: ["100% Local Privacy", "Sub-second RAG Vector Retrieval", "Async Task Engine"],
+    repoUrl: "https://github.com/meteoroite/Jarvis2"
   },
   {
     id: "healthmaster",
@@ -131,7 +132,8 @@ export const PROJECTS_DATA: Project[] = [
     keyLesson: "Media-rich applications require robust state synchronization across page switches and audio buffers.",
     featured: false,
     role: "Sole Developer",
-    metrics: ["Responsive Mobile Audio UX", "PWA Ready"]
+    metrics: ["Responsive Mobile Audio UX", "PWA Ready"],
+    repoUrl: "https://github.com/meteoroite/holy-quran"
   }
 ];
 

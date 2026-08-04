@@ -15,7 +15,8 @@ import {
   Orbit,
   Globe,
   ChevronLeft,
-  Menu
+  Menu,
+  GitBranch
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
@@ -68,6 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'capabilities', label: t.navCapabilities, icon: Layers },
     { id: 'timeline', label: t.navTimeline, icon: Milestone },
     { id: 'projects', label: t.navProjects, icon: FolderGit2 },
+    { id: 'github', label: t.navGitHub, icon: GitBranch },
     { id: 'blog', label: t.navBlog, icon: BookOpen },
     { id: 'cv', label: t.navCV, icon: FileText },
     { id: 'contact', label: t.navContact, icon: Send },

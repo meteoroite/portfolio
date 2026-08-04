@@ -7,6 +7,7 @@ export const translations = {
     navCapabilities: 'Capabilities',
     navTimeline: 'Mission Log',
     navProjects: 'Project Universe',
+    navGitHub: 'GitHub Repos',
     navBlog: 'Articles & Blog',
     navCV: 'Download Archive',
     navContact: 'Contact',
@@ -241,6 +242,7 @@ export const translations = {
     projectsKeyArchitecture: 'Key Architecture',
     projectsDiveIntoPlanet: 'Dive Into Planet',
     projectsLiveDemo: 'Live Demo',
+    projectsViewCode: 'View Code',
     projectsCloseView: 'Close Planet Surface View',
     projectsEstablishConnection: 'Establish Live Connection',
     projectsCoreArch: 'CORE ARCH',
@@ -251,6 +253,18 @@ export const translations = {
     projectsReentry: 'ATMOSPHERIC RE-ENTRY PROTOCOL ENGAGED',
     projectsDivingInto: 'Diving into',
     projectsTargetSystem: 'Target System',
+
+    // GitHub Repositories Section
+    githubHeader: 'CODE REPOSITORY NEXUS',
+    githubTitle: 'GitHub Repositories',
+    githubDesc: 'Live index of public repositories — autonomous AI engines, full-stack platforms, and experimental systems.',
+    githubSearchPlaceholder: 'Search repositories...',
+    githubCount: 'repositories online',
+    githubUpdated: 'Updated',
+    githubViewAll: 'View all repositories on GitHub',
+    githubError: 'Unable to reach the GitHub grid. Verify connection and retry.',
+    githubRetry: 'Retry Sync',
+    githubNoResults: 'No repositories match that frequency.',
 
     // Skills Section (additional)
     skillsCelestial: 'CELESTIAL CAPABILITIES SECTOR',
@@ -303,6 +317,7 @@ export const translations = {
     navCapabilities: 'القدرات',
     navTimeline: 'سجل المهمات',
     navProjects: 'عالم المشاريع',
+    navGitHub: 'مستودعات GitHub',
     navBlog: 'المقالات والمدونة',
     navCV: 'أرشيف التحميل',
     navContact: 'التواصل',
@@ -537,6 +552,7 @@ export const translations = {
     projectsKeyArchitecture: 'البنية الرئيسية',
     projectsDiveIntoPlanet: 'انغمس في الكوكب',
     projectsLiveDemo: 'عرض حي',
+    projectsViewCode: 'عرض الكود',
     projectsCloseView: 'إغلاق عرض سطح الكوكب',
     projectsEstablishConnection: 'إنشاء اتصال حي',
     projectsCoreArch: 'البنية الأساسية',
@@ -547,6 +563,18 @@ export const translations = {
     projectsReentry: 'بروتوكول إعادة الدخول الجوي مفعّل',
     projectsDivingInto: 'جاري الغوص في',
     projectsTargetSystem: 'النظام المستهدف',
+
+    // GitHub Repositories Section
+    githubHeader: 'محور المستودعات البرمجية',
+    githubTitle: 'مستودعات GitHub',
+    githubDesc: 'فهرس حي للمستودعات العامة — محركات ذكاء اصطناعي مستقلة، منصات متكاملة، وأنظمة تجريبية.',
+    githubSearchPlaceholder: 'ابحث في المستودعات...',
+    githubCount: 'مستودع متصل',
+    githubUpdated: 'آخر تحديث',
+    githubViewAll: 'عرض جميع المستودعات على GitHub',
+    githubError: 'تعذر الوصول إلى شبكة GitHub. تحقق من الاتصال وأعد المحاولة.',
+    githubRetry: 'إعادة المزامنة',
+    githubNoResults: 'لا توجد مستودعات مطابقة لهذا التردد.',
 
     // Skills Section (additional)
     skillsCelestial: 'قطاع القدرات السماوية',

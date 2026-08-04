@@ -10,7 +10,7 @@ import {
   ExternalLink, 
   Code2, 
   Sparkles, 
-  Layers, 
+  Layers,
   X,
   CheckCircle2,
   Terminal,
@@ -22,7 +22,8 @@ import {
   Compass,
   LayoutGrid,
   Orbit,
-  ArrowRight
+  ArrowRight,
+  GitBranch
 } from 'lucide-react';
 
 const containerVariants = {
@@ -427,7 +428,7 @@ export const ProjectUniverse: React.FC = () => {
                       <span className="italic font-sans text-slate-300">{project.keyLesson}</span>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 pt-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                       <button
                         onClick={() => handlePlanetClick(project)}
                         className="flex items-center gap-1.5 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 px-3.5 py-2 rounded-xl border border-cyan-500/40 font-bold transition-all hover:scale-105"
@@ -436,17 +437,30 @@ export const ProjectUniverse: React.FC = () => {
                         <span>{t.projectsDiveIntoPlanet}</span>
                       </button>
 
-                      {project.demoUrl && (
-                        <a
-                          href={project.demoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-semibold"
-                        >
-                          <span>{t.projectsLiveDemo}</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
+                      <div className="flex items-center gap-3">
+                        {project.repoUrl && (
+                          <a
+                            href={project.repoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1 text-slate-300 hover:text-cyan-300 font-semibold"
+                          >
+                            <GitBranch className="w-3.5 h-3.5" />
+                            <span>{t.projectsViewCode}</span>
+                          </a>
+                        )}
+                        {project.demoUrl && (
+                          <a
+                            href={project.demoUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-semibold"
+                          >
+                            <span>{t.projectsLiveDemo}</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -556,7 +570,7 @@ export const ProjectUniverse: React.FC = () => {
             </div>
 
             {/* Modal Bottom Actions */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-800">
               <button
                 onClick={() => setActiveModalProject(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-mono transition-colors"
@@ -564,17 +578,31 @@ export const ProjectUniverse: React.FC = () => {
                 {t.projectsCloseView}
               </button>
 
-              {activeModalProject.demoUrl && (
-                <a
-                  href={activeModalProject.demoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-mono font-bold transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-                >
-                  <span>{t.projectsEstablishConnection}</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              )}
+              <div className="flex flex-wrap items-center gap-2">
+                {activeModalProject.repoUrl && (
+                  <a
+                    href={activeModalProject.repoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl text-xs font-mono font-bold transition-all"
+                  >
+                    <GitBranch className="w-4 h-4 text-cyan-400" />
+                    <span>{t.projectsViewCode}</span>
+                  </a>
+                )}
+
+                {activeModalProject.demoUrl && (
+                  <a
+                    href={activeModalProject.demoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-mono font-bold transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                  >
+                    <span>{t.projectsEstablishConnection}</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
             </div>
 
           </div>

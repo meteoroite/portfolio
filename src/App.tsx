@@ -10,6 +10,7 @@ import { BioSection } from './components/sections/BioSection';
 import { SkillsConstellation } from './components/sections/SkillsConstellation';
 import { TimelineSection } from './components/sections/TimelineSection';
 import { ProjectUniverse } from './components/sections/ProjectUniverse';
+import { GitHubReposSection } from './components/sections/GitHubReposSection';
 import { CVArchiveSection } from './components/sections/CVArchiveSection';
 import { ContactTerminal } from './components/sections/ContactTerminal';
 import { BlogSection } from './components/sections/BlogSection';
@@ -118,6 +119,8 @@ function AppInner() {
             {activeTab === 'timeline' && <TimelineSection />}
 
             {activeTab === 'projects' && <ProjectUniverse />}
+
+            {activeTab === 'github' && <GitHubReposSection />}
 
             {activeTab === 'blog' && <BlogSection />}
 
