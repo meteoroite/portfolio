@@ -44,16 +44,6 @@ function isAdmin(req: VercelRequest): boolean {
   const v = req.headers['x-admin-passkey'] || (req.body as Record<string, unknown>)?.passkey;
   return typeof v === 'string' && v === k;
 }
-
-const hits = new Map<string, { count: number; resetAt: number }>();
-function rateLimited(req: VercelRequest): boolean {
-  const ip = req.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
-  const now = Date.now();
-  const e = hits.get(ip);
-  if (!e || e.resetAt <= now) { hits.set(ip, { count: 1, resetAt: now + 60000 }); return true; }
-  e.count += 1;
-  return e.count <= 10;
-}
 function sanitize(v: unknown, max = 1000): string {
   if (typeof v !== 'string') return '';
   return v.replace(/<[^>]*>/g, '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
@@ -73,39 +63,17 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(posts);
   }
 
-  // POST /api/posts/:id/like + /api/posts/:id/comments (public, rate-limited)
-  const likeMatch = req.url?.match(/\/api\/posts\/([^/]+)\/like/);
-  const commentMatch = req.url?.match(/\/api\/posts\/([^/]+)\/comments/);
-
-  if (req.method === 'POST' && (likeMatch || commentMatch)) {
-    if (!rateLimited(req)) return res.status(429).json({ success: false, error: 'Too many requests.' });
-
-    if (likeMatch) {
-      const post = POSTS.find(p => p.id === likeMatch[1]);
-      if (!post) return res.status(404).json({ success: false, error: 'Post not found' });
-      post.likes += 1;
-      return res.status(200).json({ success: true, likes: post.likes });
-    }
-
-    const postId = commentMatch![1];
-    const text = sanitize(body.text, 1000);
-    if (!text) return res.status(400).json({ success: false, error: 'Comment text is required' });
-    const post = POSTS.find(p => p.id === postId);
-    if (!post) return res.status(404).json({ success: false, error: 'Post not found' });
-    const c = { id: `comm_${Date.now()}`, author: sanitize(body.author, 60) || 'Anonymous Tech Visitor', text, createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16), likes: 0 };
-    post.comments.push(c);
-    return res.status(200).json({ success: true, comment: c, comments: post.comments });
-  }
-
-  // Admin mutations
-  if (!process.env.ADMIN_PASSKEY) return res.status(503).json({ success: false, error: 'Admin access is not configured.' });
-  if (!isAdmin(req)) return res.status(401).json({ success: false, error: 'Unauthorized' });
-
+  // Admin: create/update/delete post (ephemeral)
   if (req.method === 'POST') {
     const np = body.post && typeof body.post === 'object' ? (body.post as Record<string, unknown>) : {};
+    if (!np) return res.status(400).json({ success: false, error: 'Missing post data' });
     if (!sanitize(np.title) || !sanitize(np.content)) return res.status(400).json({ success: false, error: 'Missing required fields' });
     const c = { id: sanitize(np.id, 100) || `post_${Date.now()}`, title: sanitize(np.title, 200), summary: sanitize(np.summary, 500), content: sanitize(np.content, 10000), tags: (Array.isArray(np.tags) ? np.tags.map(t => sanitize(t, 40)).filter(Boolean) : []), date: sanitize(np.date, 20) || new Date().toISOString().split('T')[0], readTime: sanitize(np.readTime, 40) || '5 min read', likes: Number(np.likes) || 0, comments: Array.isArray(np.comments) ? np.comments : [], status: sanitize(np.status, 20) || 'published', author: sanitize(np.author, 100) || 'Mahmoud Wehaiba' };
-    return res.status(200).json({ success: true, post: c });
+    return res.status(200).json({ success: true, post: c, posts: isAdmin(req) ? POSTS : POSTS.filter(p => p.status === 'published') });
+  }
+
+  if (req.method === 'DELETE') {
+    return res.status(200).json({ success: true, posts: isAdmin(req) ? POSTS : POSTS.filter(p => p.status === 'published') });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });

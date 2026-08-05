@@ -162,11 +162,8 @@ export const AdminDashboard: React.FC = () => {
 
     try {
       const isNew = !editingPost.id;
-      const url = isNew ? '/api/posts' : `/api/posts/${editingPost.id}`;
-      const method = isNew ? 'POST' : 'PUT';
-
-      const res = await fetch(url, {
-        method,
+      const res = await fetch('/api/posts', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-admin-passkey': passkey
@@ -191,9 +188,10 @@ export const AdminDashboard: React.FC = () => {
   const handleDeletePost = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
-      const res = await fetch(`/api/posts/${id}`, {
+      const res = await fetch('/api/posts', {
         method: 'DELETE',
-        headers: { 'x-admin-passkey': passkey }
+        headers: { 'Content-Type': 'application/json', 'x-admin-passkey': passkey },
+        body: JSON.stringify({ postId: id })
       });
       const data = await res.json();
       if (res.ok && data.success) {

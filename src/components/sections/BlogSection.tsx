@@ -80,7 +80,7 @@ export const BlogSection: React.FC = () => {
   const handleLikePost = async (postId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     try {
-      const res = await fetch(`/api/posts/${postId}/like`, { method: 'POST' });
+      const res = await fetch('/api/like', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ postId }) });
       if (res.ok) {
         const data = await res.json();
         setPosts(prev => prev.map(p => p.id === postId ? { ...p, likes: data.likes } : p));
@@ -99,10 +99,11 @@ export const BlogSection: React.FC = () => {
 
     setSubmittingComment(true);
     try {
-      const res = await fetch(`/api/posts/${selectedPost.id}/comments`, {
+      const res = await fetch('/api/comment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          postId: selectedPost.id,
           author: commentAuthor,
           text: commentText
         })
