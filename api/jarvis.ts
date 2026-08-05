@@ -171,14 +171,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const configured = PROVIDERS.filter(p => process.env[`${p.name.toUpperCase()}_API_KEY`]);
     if (configured.length === 0) {
-      return res.status(200).json({ reply: DEFAULT_FALLBACK });
+      return res.status(200).json({ reply: DEFAULT_FALLBACK, provider: 'offline' });
     }
 
     const errors: string[] = [];
     for (const provider of configured) {
       try {
         const replyText = await provider.call(message, conversationHistory);
-        return res.status(200).json({ reply: replyText });
+        return res.status(200).json({ reply: replyText, provider: provider.name });
       } catch (err: any) {
         errors.push(`${provider.name}:${err?.message || 'error'}`);
       }
@@ -186,12 +186,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.error('[JARVIS ALL PROVIDERS FAILED]', errors.join(' | '));
     return res.status(200).json({
-      reply: `I apologize — all AI providers are temporarily unavailable (${errors.join(', ')}). Please try again shortly, or explore the portfolio sections directly.`
+      reply: `I apologize — all AI providers are temporarily unavailable (${errors.join(', ')}). Please try again shortly, or explore the portfolio sections directly.`,
+      provider: 'offline'
     });
   } catch (err: any) {
     console.error('[JARVIS ERROR]', err?.message || err);
     return res.status(200).json({
-      reply: `I apologize — JARVIS encountered a processing issue (${err?.message || 'unknown error'}). Please try again or explore the portfolio sections directly.`
+      reply: `I apologize — JARVIS encountered a processing issue (${err?.message || 'unknown error'}). Please try again or explore the portfolio sections directly.`,
+      provider: 'offline'
     });
   }
 }

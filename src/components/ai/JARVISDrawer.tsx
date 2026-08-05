@@ -32,6 +32,7 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
     }
   ]);
   const [loading, setLoading] = useState(false);
+  const [activeProvider, setActiveProvider] = useState<string | null>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,6 +77,7 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
 
       const data = await res.json();
       const replyText = data.reply || "JARVIS experienced an anomaly retrieving the requested data.";
+      if (data.provider) setActiveProvider(data.provider);
 
       const jarvisMsg: JARVISMessage = {
         id: (Date.now() + 1).toString(),
@@ -120,8 +122,29 @@ export const JARVISDrawer: React.FC<JARVISDrawerProps> = ({ isOpen, onClose, onN
             <div>
               <div className="font-bold text-sm text-white flex items-center gap-2">
                 <span>{t.jarvisTitle}</span>
-                <span className="text-[10px] px-2 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40">
-                  Gemini 3.6
+                <span
+                  className={`text-[10px] px-2 py-0.2 rounded border font-bold inline-flex items-center gap-1.5 ${
+                    activeProvider === 'groq'
+                      ? 'bg-orange-950 text-orange-300 border-orange-500/40'
+                      : activeProvider === 'openrouter'
+                        ? 'bg-violet-950 text-violet-300 border-violet-500/40'
+                        : activeProvider === 'gemini'
+                          ? 'bg-cyan-950 text-cyan-300 border-cyan-500/40'
+                          : 'bg-slate-800 text-slate-300 border-slate-600/50'
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      activeProvider && activeProvider !== 'offline'
+                        ? 'bg-emerald-400 animate-pulse'
+                        : 'bg-amber-400'
+                    }`}
+                  />
+                  {activeProvider === 'offline'
+                    ? t.jarvisOffline
+                    : activeProvider
+                      ? activeProvider.charAt(0).toUpperCase() + activeProvider.slice(1)
+                      : t.jarvisProviderUnknown}
                 </span>
               </div>
               <div className="text-[10px] text-slate-400">

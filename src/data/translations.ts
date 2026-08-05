@@ -309,6 +309,8 @@ export const translations = {
     jarvisOffline: 'JARVIS Offline Mode',
     jarvisProcessing: 'JARVIS query processing...',
     jarvisError: 'Network error communicating with JARVIS server.',
+    jarvisProviderLabel: 'Core',
+    jarvisProviderUnknown: 'detecting...',
   },
 
   ar: {
@@ -619,5 +621,7 @@ export const translations = {
     jarvisOffline: 'جارفس في وضع عدم الاتصال',
     jarvisProcessing: 'جاري معالجة استفسار جارفس...',
     jarvisError: 'خطأ في الاتصال بخادم جارفس.',
+    jarvisProviderLabel: 'النواة',
+    jarvisProviderUnknown: 'جارٍ الكشف...',
   }
 } as const;
