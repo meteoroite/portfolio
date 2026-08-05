@@ -3,6 +3,10 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
+    { "source": "/api/posts/:id/like", "destination": "/api/posts" },
+    { "source": "/api/posts/:id/comments", "destination": "/api/posts" },
+    { "source": "/api/posts/:id/:action", "destination": "/api/posts" },
+    { "source": "/api/posts/:id", "destination": "/api/posts" },
     { "source": "/api/(.*)", "destination": "/api/$1" }
   ],
   "headers": [
