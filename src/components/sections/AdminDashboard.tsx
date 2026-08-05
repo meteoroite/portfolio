@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const [passkey, setPasskey] = useState<string>('admin123');
+  const [passkey, setPasskey] = useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string>('');
   const [verifying, setVerifying] = useState<boolean>(false);
@@ -101,8 +101,8 @@ export const AdminDashboard: React.FC = () => {
     setAuthError('');
 
     // Check OTP first if in OTP step
-    if (authStep === 'otp_verification' && otpInput.trim() !== generatedOtp && otpInput.trim() !== '882910') {
-      setAuthError(`Invalid 6-digit OTP code. Enter ${generatedOtp} or 882910.`);
+    if (authStep === 'otp_verification' && otpInput.trim() !== generatedOtp) {
+      setAuthError(`Invalid 6-digit OTP code. Enter ${generatedOtp}.`);
       setVerifying(false);
       return;
     }
@@ -383,7 +383,7 @@ export const AdminDashboard: React.FC = () => {
                 className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-colors"
               />
               <p className="text-[10px] text-slate-500 italic">
-                Master passkey: <code className="text-cyan-400">admin123</code>
+                Enter the master passkey configured in the ADMIN_PASSKEY environment variable.
               </p>
             </div>
 

@@ -16,11 +16,15 @@ async function startServer() {
   let dynamicProjects: Project[] = [...PROJECTS_DATA];
   let dynamicPosts: BlogPost[] = JSON.parse(JSON.stringify(INITIAL_POSTS_DATA));
 
-  // Admin secret key (configurable via env or fallback)
-  const ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || "admin123";
+  // Admin secret key (fail-closed: no env var => no admin access)
+  const ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || null;
 
   // Helper middleware to check admin authorization
   const requireAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (!ADMIN_PASSKEY) {
+      res.status(503).json({ success: false, error: "Admin access is not configured." });
+      return;
+    }
     const passkey = req.headers['x-admin-passkey'] || req.body?.passkey;
     if (passkey === ADMIN_PASSKEY) {
       next();

@@ -51,10 +51,113 @@ CV VARIANTS:
 
 TONE: Crisp, technical, professional. Answer using ONLY the verified data above. Be concise (2-3 sentences max). If asked about something not in the knowledge base, politely say you only have information about Mahmoud's verified profile.`;
 
+const DEFAULT_FALLBACK = `JARVIS Offline Mode: Hello! I am operating in fallback mode because no AI provider key is currently available. Mahmoud Wehaiba holds a B.Sc. in Agricultural Engineering from Tanta University (2024), completed military service (2025-2026), and specializes in full-stack web development (React/Node/FastAPI/C#) and local AI agent engineering (Ollama/Qdrant/LangChain). Feel free to explore the interactive tabs!`;
+
+const PROVIDER_COOLDOWN_MS = 60_000;
+const cooldowns = new Map<string, number>();
+function inCooldown(name: string): boolean {
+  return (cooldowns.get(name) || 0) > Date.now();
+}
+function markCooldown(name: string) {
+  cooldowns.set(name, Date.now() + PROVIDER_COOLDOWN_MS);
+}
+
+interface ChatMessage { role: string; content: string }
+
+function toOpenAIMessages(history: Array<{ sender: string; text: string }>, message: string): ChatMessage[] {
+  const msgs: ChatMessage[] = [{ role: 'system', content: SYSTEM_PROMPT }];
+  for (const m of history.slice(-6)) {
+    msgs.push({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text });
+  }
+  msgs.push({ role: 'user', content: message });
+  return msgs;
+}
+
+function extractOpenAIText(data: any): string {
+  return data?.choices?.[0]?.message?.content || '';
+}
+
+async function callGroq(message: string, history: Array<{ sender: string; text: string }>): Promise<string> {
+  const key = process.env.GROQ_API_KEY;
+  if (!key || inCooldown('groq')) throw new Error('groq-unavailable');
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+    body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: toOpenAIMessages(history, message), temperature: 0.7, max_tokens: 1024 })
+  });
+  if (res.status === 429) { markCooldown('groq'); throw new Error('groq-ratelimit'); }
+  if (!res.ok) throw new Error(`groq-http-${res.status}`);
+  const data = await res.json();
+  const text = extractOpenAIText(data);
+  if (!text) throw new Error('groq-empty');
+  return text;
+}
+
+async function callOpenRouter(message: string, history: Array<{ sender: string; text: string }>): Promise<string> {
+  const key = process.env.OPENROUTER_API_KEY;
+  if (!key || inCooldown('openrouter')) throw new Error('openrouter-unavailable');
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+      'HTTP-Referer': 'https://mahmoud-wehaiba-portfolio.vercel.app',
+      'X-Title': 'Mahmoud Wehaiba Portfolio JARVIS'
+    },
+    body: JSON.stringify({ model: 'meta-llama/llama-3.3-70b-instruct:free', messages: toOpenAIMessages(history, message), temperature: 0.7, max_tokens: 1024 })
+  });
+  if (res.status === 429) { markCooldown('openrouter'); throw new Error('openrouter-ratelimit'); }
+  if (!res.ok) throw new Error(`openrouter-http-${res.status}`);
+  const data = await res.json();
+  const text = extractOpenAIText(data);
+  if (!text) throw new Error('openrouter-empty');
+  return text;
+}
+
+function toGeminiContents(history: Array<{ sender: string; text: string }>, message: string) {
+  const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+  for (const m of history.slice(-6)) {
+    contents.push({ role: m.sender === 'user' ? 'user' : 'model', parts: [{ text: m.text }] });
+  }
+  contents.push({ role: 'user', parts: [{ text: message }] });
+  return contents;
+}
+
+async function callGemini(message: string, history: Array<{ sender: string; text: string }>): Promise<string> {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key || inCooldown('gemini')) throw new Error('gemini-unavailable');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(key)}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: toGeminiContents(history, message),
+      generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+    })
+  });
+  if (res.status === 429) { markCooldown('gemini'); throw new Error('gemini-ratelimit'); }
+  if (!res.ok) throw new Error(`gemini-http-${res.status}`);
+  const data = await res.json();
+  const text = (data?.candidates?.[0]?.content?.parts || []).map((p: any) => p.text || '').join('');
+  if (!text) throw new Error('gemini-empty');
+  return text;
+}
+
+const PROVIDERS: Array<{ name: string; call: (m: string, h: Array<{ sender: string; text: string }>) => Promise<string> }> = [
+  { name: 'groq', call: callGroq },
+  { name: 'openrouter', call: callOpenRouter },
+  { name: 'gemini', call: callGemini }
+];
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin;
+  if (origin && ['https://mahmoud-wehaiba-portfolio.vercel.app', 'http://localhost:5173', 'http://localhost:4173'].includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   if (!rateLimited(req)) return res.status(429).json({ reply: 'JARVIS is receiving too many transmissions. Please wait a moment and try again.' });
@@ -62,36 +165,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const body = (req.body && typeof req.body === 'object' ? req.body : {}) as Record<string, unknown>;
     const message = sanitize(body.message, 2000);
-    const conversationHistory = Array.isArray(body.conversationHistory) ? body.conversationHistory : [];
+    const conversationHistory = Array.isArray(body.conversationHistory) ? body.conversationHistory as Array<{ sender: string; text: string }> : [];
 
     if (!message) return res.status(400).json({ error: 'Message string is required.' });
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(200).json({
-        reply: `JARVIS Offline Mode: Hello! I am operating in fallback mode because the Gemini API key is not configured. Mahmoud Wehaiba holds a B.Sc. in Agricultural Engineering from Tanta University (2024), completed military service (2025-2026), and specializes in full-stack web development (React/Node/FastAPI/C#) and local AI agent engineering (Ollama/Qdrant/LangChain). Feel free to explore the interactive tabs!`
-      });
+    const configured = PROVIDERS.filter(p => process.env[`${p.name.toUpperCase()}_API_KEY`]);
+    if (configured.length === 0) {
+      return res.status(200).json({ reply: DEFAULT_FALLBACK });
     }
 
-    const { GoogleGenAI } = await import('@google/genai');
-    const ai = new GoogleGenAI({ apiKey });
-
-    const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
-    if (conversationHistory.length > 0) {
-      for (const msg of conversationHistory.slice(-6)) {
-        contents.push({ role: msg.sender === 'user' ? 'user' : 'model', parts: [{ text: msg.text }] });
+    const errors: string[] = [];
+    for (const provider of configured) {
+      try {
+        const replyText = await provider.call(message, conversationHistory);
+        return res.status(200).json({ reply: replyText });
+      } catch (err: any) {
+        errors.push(`${provider.name}:${err?.message || 'error'}`);
       }
     }
-    contents.push({ role: 'user', parts: [{ text: message }] });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents,
-      config: { systemInstruction: SYSTEM_PROMPT, temperature: 0.7 }
+    console.error('[JARVIS ALL PROVIDERS FAILED]', errors.join(' | '));
+    return res.status(200).json({
+      reply: `I apologize — all AI providers are temporarily unavailable (${errors.join(', ')}). Please try again shortly, or explore the portfolio sections directly.`
     });
-
-    const replyText = response.text || 'JARVIS received your query but produced an empty response.';
-    return res.status(200).json({ reply: replyText });
   } catch (err: any) {
     console.error('[JARVIS ERROR]', err?.message || err);
     return res.status(200).json({
