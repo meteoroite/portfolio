@@ -1,28 +1,142 @@
 @import "tailwindcss";
 
-/* Custom Scrollbar — Cyan/Dark Theme */
+/* ============================================================
+   THEME TOKENS — Galaxy (default) / Agriculture
+   Tailwind @theme inline maps color utilities (bg-cyan-400,
+   text-slate-300, border-cyan-500, etc.) to these CSS variables,
+   so existing utility classes follow the active data-theme.
+   ============================================================ */
+
+:root,
+:root[data-theme="galaxy"] {
+  /* Root / page background */
+  --bg-root: #050608;
+
+  /* CYAN accent -> (galaxy keeps default cyan) */
+  --color-cyan-100: #cffafe;
+  --color-cyan-200: #a5f3fc;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+  --color-cyan-700: #0e7490;
+  --color-cyan-900: #164e63;
+  --color-cyan-950: #083344;
+
+  /* BLUE accent -> galaxy default */
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-900: #1e3a8a;
+  --color-blue-950: #172554;
+
+  /* SLATE surfaces -> galaxy default */
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-850: #17203a;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+}
+
+:root[data-theme="agriculture"] {
+  /* Alt / page background -> deep fertile soil at night */
+  --bg-root: #0c120c;
+
+  /* CYAN accent -> leaf greens */
+  --color-cyan-100: #d9f5e1;
+  --color-cyan-200: #b3ecc6;
+  --color-cyan-300: #83d99d;
+  --color-cyan-400: #5cc477;
+  --color-cyan-500: #43ab5f;
+  --color-cyan-600: #35894c;
+  --color-cyan-700: #2b7040;
+  --color-cyan-900: #1c4629;
+  --color-cyan-950: #122b1c;
+
+  /* BLUE accent -> sun/amber wheat + daytime sky */
+  --color-blue-300: #f6e08a;
+  --color-blue-400: #f2cf5e;
+  --color-blue-500: #e9b83d;
+  --color-blue-600: #d69e2a;
+  --color-blue-900: #7a5420;
+  --color-blue-950: #4a3312;
+
+  /* SLATE surfaces -> warm soil/earth tones (kept dark for contrast) */
+  --color-slate-100: #f2f7f2;
+  --color-slate-200: #e0eae0;
+  --color-slate-300: #c3d3c4;
+  --color-slate-400: #9db09f;
+  --color-slate-500: #7c907e;
+  --color-slate-600: #5c6b5e;
+  --color-slate-700: #414d43;
+  --color-slate-800: #2a342c;
+  --color-slate-850: #242e26;
+  --color-slate-900: #1a221b;
+  --color-slate-950: #0e150e;
+}
+
+/* Make Tailwind utilities resolve to the tokens above */
+@theme inline {
+  --color-cyan-100: var(--color-cyan-100);
+  --color-cyan-200: var(--color-cyan-200);
+  --color-cyan-300: var(--color-cyan-300);
+  --color-cyan-400: var(--color-cyan-400);
+  --color-cyan-500: var(--color-cyan-500);
+  --color-cyan-600: var(--color-cyan-600);
+  --color-cyan-700: var(--color-cyan-700);
+  --color-cyan-900: var(--color-cyan-900);
+  --color-cyan-950: var(--color-cyan-950);
+
+  --color-blue-300: var(--color-blue-300);
+  --color-blue-400: var(--color-blue-400);
+  --color-blue-500: var(--color-blue-500);
+  --color-blue-600: var(--color-blue-600);
+  --color-blue-900: var(--color-blue-900);
+  --color-blue-950: var(--color-blue-950);
+
+  --color-slate-100: var(--color-slate-100);
+  --color-slate-200: var(--color-slate-200);
+  --color-slate-300: var(--color-slate-300);
+  --color-slate-400: var(--color-slate-400);
+  --color-slate-500: var(--color-slate-500);
+  --color-slate-600: var(--color-slate-600);
+  --color-slate-700: var(--color-slate-700);
+  --color-slate-800: var(--color-slate-800);
+  --color-slate-850: var(--color-slate-850);
+  --color-slate-900: var(--color-slate-900);
+  --color-slate-950: var(--color-slate-950);
+}
+
+/* Custom Scrollbar — theme-aware */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0e14;
+  background: var(--bg-root);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #0891b2, #0e7490);
+  background: linear-gradient(180deg, var(--color-cyan-700), var(--color-cyan-900));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #22d3ee, #06b6d4);
+  background: linear-gradient(180deg, var(--color-cyan-300), var(--color-cyan-500));
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #0891b2 #0a0e14;
+  scrollbar-color: var(--color-cyan-700) var(--bg-root);
 }
 
 /* iOS momentum scrolling for touch containers */
@@ -42,6 +156,20 @@ html, body {
 }
 
 ::selection {
-  background: #06b6d4;
-  color: #020617;
+  background: var(--color-cyan-500);
+  color: var(--bg-root);
+}
+
+/* Smooth theme transition for color-bearing elements */
+html[data-theme] * {
+  transition-property: background-color, border-color, color;
+  transition-duration: 300ms;
+  transition-timing-function: ease-out;
+}
+
+/* Respect reduced-motion: skip theme transition */
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme] * {
+    transition: none;
+  }
 }

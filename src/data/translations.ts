@@ -22,6 +22,8 @@ export const translations = {
     navSection: 'Navigation',
     navControls: 'Controls',
     navMenuLabel: 'MENU',
+    navThemeAgriculture: 'Switch to Agriculture Theme',
+    navThemeGalaxy: 'Switch to Galaxy Theme',
 
     // Galaxy Portal
     galaxyWelcome: 'Greetings, Explorer. You have arrived at the event horizon of Mahmoud Wehaiba — Staff Architect & AI Engineer. Ahead lies a galaxy of autonomous multi-agent networks, real-time computer vision, and resilient full-stack systems. Prepare for full quantum immersion.',
@@ -334,6 +336,8 @@ export const translations = {
     navSection: 'التنقل',
     navControls: 'التحكم',
     navMenuLabel: 'قائمة',
+    navThemeAgriculture: 'التبديل إلى ثيم الزراعة',
+    navThemeGalaxy: 'التبديل إلى ثيم المجرة',
 
     // Galaxy Portal
     galaxyWelcome: 'مرحباً، أيها المستكشف. لقد وصلت إلى أفق الحدث الخاص بمحمود وهيبة — المعماري الأول ومهندس الذكاء الاصطناعي. أمامك مجرة من شبكات الوكيل المتعددة المستقلة، ورؤية الحاسوب في الوقت الفعلي، وأنظمة متكاملة مرنة. استعد للانغماس الكمي الكامل.',

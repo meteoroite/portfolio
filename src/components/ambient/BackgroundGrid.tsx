@@ -6,7 +6,7 @@ interface BackgroundGridProps {
 
 export const BackgroundGrid: React.FC<BackgroundGridProps> = ({ reducedMotion }) => {
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#050608]">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[var(--bg-root)]">
       {/* Radial Atmospheric Ambient Glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-cyan-950/20 rounded-full blur-[140px]" />
       <div className="absolute bottom-1/4 right-10 w-[500px] h-[500px] bg-blue-950/20 rounded-full blur-[120px]" />

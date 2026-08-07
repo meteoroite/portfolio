@@ -16,11 +16,14 @@ import {
   Globe,
   ChevronLeft,
   Menu,
-  GitBranch
+  GitBranch,
+  Sprout,
+  Settings2
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
 import { useLang } from '../../lib/language';
+import { useTheme } from '../../lib/theme';
 
 interface NavbarProps {
   activeTab: string;
@@ -42,6 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const { t, toggleLang, isArabic } = useLang();
+  const { theme, toggleTheme } = useTheme();
 
   // Secret admin access: press Ctrl+Shift+A
   useEffect(() => {
@@ -127,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed top-0 left-0 z-[60] h-full w-[min(280px,75vw)] bg-[#050608]/98 backdrop-blur-2xl border-r border-slate-800/80 flex flex-col font-mono overflow-y-auto"
+            className="fixed top-0 left-0 z-[60] h-full w-[min(280px,75vw)] bg-[var(--bg-root)]/98 backdrop-blur-2xl border-r border-slate-800/80 flex flex-col font-mono overflow-y-auto"
             style={{ 
               boxShadow: '4px 0 40px rgba(6, 182, 212, 0.08), 0 0 80px rgba(0, 0, 0, 0.5)' 
             }}
@@ -211,6 +215,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Globe className="w-4 h-4 text-slate-500 shrink-0" />
                 <span className="font-medium">{isArabic ? 'English' : 'العربية'}</span>
+              </button>
+
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:bg-slate-900/80 hover:text-slate-200 transition-all border border-transparent hover:border-slate-800 min-h-[44px]"
+              >
+                <Sprout className={`w-4 h-4 shrink-0 ${theme === 'agriculture' ? 'text-cyan-300' : 'text-slate-500'}`} />
+                <span className="font-medium">
+                  {theme === 'agriculture' ? t.navThemeGalaxy : t.navThemeAgriculture}
+                </span>
               </button>
 
               {/* Galaxy Portal */}

@@ -17,15 +17,18 @@ import { BlogSection } from './components/sections/BlogSection';
 import { AdminDashboard } from './components/sections/AdminDashboard';
 import { JARVISDrawer } from './components/ai/JARVISDrawer';
 import { LanguageProvider, useLang } from './lib/language';
+import { ThemeProvider } from './lib/theme';
 import { PERSONAL_INFO } from './data/profileData';
 import { BRAND_ASSETS } from './data/brandAssets';
 import { ShieldCheck, Bot, Sparkles, Terminal, Mail, Heart } from 'lucide-react';
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AppInner />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AppInner />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 
@@ -58,7 +61,7 @@ function AppInner() {
   }, [activeTab]);
 
   return (
-    <div className="min-h-screen bg-[#050608] text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950 relative flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--bg-root)] text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950 relative flex flex-col justify-between overflow-x-hidden">
       
       {/* Animated Galaxy Portal Landing View */}
       {showGalaxyPortal && (

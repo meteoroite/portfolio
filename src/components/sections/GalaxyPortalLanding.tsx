@@ -205,13 +205,13 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
   ];
 
   return (
-    <div className="fixed inset-0 z-[58] bg-[#050608] text-white font-mono flex flex-col overflow-hidden selection:bg-cyan-500 selection:text-slate-950">
+    <div className="fixed inset-0 z-[58] bg-[var(--bg-root)] text-white font-mono flex flex-col overflow-hidden selection:bg-cyan-500 selection:text-slate-950">
 
       {/* Background Interactive Galaxy Canvas */}
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
 
       {/* Top Bar Header — always visible */}
-      <header className="relative z-20 shrink-0 border-b border-slate-900/70 bg-[#050608]/75 backdrop-blur-md">
+      <header className="relative z-20 shrink-0 border-b border-slate-900/70 bg-[var(--bg-root)]/75 backdrop-blur-md">
         <div className="max-w-7xl mx-auto w-full p-4 sm:p-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-slate-950/90 border border-cyan-400/60 overflow-hidden flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.4)]">

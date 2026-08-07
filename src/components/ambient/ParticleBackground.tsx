@@ -1,7 +1,14 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../../lib/theme';
 
-export const ParticleBackground: React.FC = () => {
+interface ParticleBackgroundProps {
+  theme?: 'galaxy' | 'agriculture';
+}
+
+export const ParticleBackground: React.FC<ParticleBackgroundProps> = ({ theme }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const { theme: contextTheme } = useTheme();
+  const activeTheme = theme ?? contextTheme;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -22,6 +29,13 @@ export const ParticleBackground: React.FC = () => {
 
     window.addEventListener('resize', handleResize);
 
+    const isAgri = activeTheme === 'agriculture';
+
+    // Particle palette (theme-aware)
+    const colors = isAgri
+      ? ['rgba(92, 196, 119, ', 'rgba(227, 184, 61, ', 'rgba(163, 230, 152, ', 'rgba(233, 220, 138, ']
+      : ['rgba(6, 182, 212, ', 'rgba(59, 130, 246, ', 'rgba(168, 85, 247, ', 'rgba(16, 185, 129, '];
+
     // Particle pool
     const particleCount = Math.min(Math.floor(window.innerWidth / 16), 85);
     const particles: Array<{
@@ -34,8 +48,6 @@ export const ParticleBackground: React.FC = () => {
       alpha: number;
       twinkleSpeed: number;
     }> = [];
-
-    const colors = ['rgba(6, 182, 212, ', 'rgba(59, 130, 246, ', 'rgba(168, 85, 247, ', 'rgba(16, 185, 129, '];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -72,7 +84,7 @@ export const ParticleBackground: React.FC = () => {
         speed: Math.random() * 12 + 8,
         angle: (Math.PI / 180) * (Math.random() * 20 + 35), // ~45 deg downward streak
         alpha: 1,
-        color: Math.random() > 0.5 ? '#06b6d4' : '#3b82f6',
+        color: isAgri ? '#e9b83d' : (Math.random() > 0.5 ? '#06b6d4' : '#3b82f6'),
         thickness: Math.random() * 1.5 + 1,
       };
     };
@@ -125,11 +137,11 @@ export const ParticleBackground: React.FC = () => {
         lastMeteorSpawn = now;
       }
 
-      // Draw Distant Glowing Moon / Planetary Silhouette in Top Right & Bottom Left
+      // Draw Distant Glowing Sun / Light Halo in Top Right & Bottom Left
       ctx.save();
       const moonGrad = ctx.createRadialGradient(width * 0.85, height * 0.18, 5, width * 0.85, height * 0.18, 90);
-      moonGrad.addColorStop(0, 'rgba(6, 182, 212, 0.12)');
-      moonGrad.addColorStop(0.5, 'rgba(59, 130, 246, 0.05)');
+      moonGrad.addColorStop(0, isAgri ? 'rgba(233, 184, 61, 0.14)' : 'rgba(6, 182, 212, 0.12)');
+      moonGrad.addColorStop(0.5, isAgri ? 'rgba(92, 196, 119, 0.05)' : 'rgba(59, 130, 246, 0.05)');
       moonGrad.addColorStop(1, 'transparent');
       ctx.fillStyle = moonGrad;
       ctx.beginPath();
@@ -168,7 +180,7 @@ export const ParticleBackground: React.FC = () => {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(56, 189, 248, ${0.12 * (1 - dist / 110)})`;
+            ctx.strokeStyle = isAgri ? `rgba(92, 196, 119, ${0.14 * (1 - dist / 110)})` : `rgba(56, 189, 248, ${0.12 * (1 - dist / 110)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -182,7 +194,7 @@ export const ParticleBackground: React.FC = () => {
           ctx.beginPath();
           ctx.moveTo(p1.x, p1.y);
           ctx.lineTo(mouseX, mouseY);
-          ctx.strokeStyle = `rgba(6, 182, 212, ${0.28 * (1 - mdist / 140)})`;
+          ctx.strokeStyle = isAgri ? `rgba(233, 184, 61, ${0.3 * (1 - mdist / 140)})` : `rgba(6, 182, 212, ${0.28 * (1 - mdist / 140)})`;
           ctx.lineWidth = 0.7;
           ctx.stroke();
         }
@@ -202,8 +214,8 @@ export const ParticleBackground: React.FC = () => {
         ctx.save();
         ctx.translate(deb.x, deb.y);
         ctx.rotate(deb.rotation);
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.25)';
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+        ctx.fillStyle = isAgri ? 'rgba(124, 144, 126, 0.28)' : 'rgba(148, 163, 184, 0.25)';
+        ctx.strokeStyle = isAgri ? 'rgba(92, 196, 119, 0.45)' : 'rgba(6, 182, 212, 0.4)';
         ctx.lineWidth = 0.8;
         ctx.beginPath();
         ctx.rect(-deb.size / 2, -deb.size / 2, deb.size, deb.size);
@@ -251,7 +263,7 @@ export const ParticleBackground: React.FC = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [activeTheme]);
 
   return (
     <canvas
