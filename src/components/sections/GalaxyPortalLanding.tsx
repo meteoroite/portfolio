@@ -5,6 +5,7 @@ import { TypewriterText } from '../ui/TypewriterText';
 import { PERSONAL_INFO } from '../../data/profileData';
 import { BRAND_ASSETS } from '../../data/brandAssets';
 import { useLang } from '../../lib/language';
+import { useTheme } from '../../lib/theme';
 import { 
   Orbit, 
   Sparkles, 
@@ -29,6 +30,7 @@ interface GalaxyPortalLandingProps {
 
 export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnterGalaxy }) => {
   const { t } = useLang();
+  const { theme: activeTheme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isWarping, setIsWarping] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState<string>('bio');
@@ -77,6 +79,23 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
+    const isAgri = activeTheme === 'agriculture';
+    const palette = isAgri
+      ? {
+          fade: 'rgba(12, 18, 12, 0.25)',
+          stars: ['#5cc477', '#b5e09a', '#e3b83d', '#a3e698', '#ffffff', '#8fd67f'],
+          core0: 'rgba(92, 196, 119, 0.35)',
+          core1: 'rgba(179, 224, 154, 0.2)',
+          core2: 'rgba(227, 184, 61, 0.08)',
+        }
+      : {
+          fade: 'rgba(5, 6, 8, 0.25)',
+          stars: ['#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff', '#10b981'],
+          core0: 'rgba(6, 182, 212, 0.35)',
+          core1: 'rgba(59, 130, 246, 0.2)',
+          core2: 'rgba(139, 92, 246, 0.08)',
+        };
+
     const handleResize = () => {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
@@ -97,7 +116,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
       color: string;
     }> = [];
 
-    const colors = ['#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff', '#10b981'];
+    const colors = palette.stars;
 
     for (let i = 0; i < starCount; i++) {
       const distance = Math.pow(Math.random(), 1.8) * Math.min(width, height) * 0.45 + 20;
@@ -117,7 +136,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
     let warpSpeed = 1;
 
     const render = () => {
-      ctx.fillStyle = 'rgba(5, 6, 8, 0.25)';
+      ctx.fillStyle = palette.fade;
       ctx.fillRect(0, 0, width, height);
 
       const centerX = width / 2;
@@ -125,9 +144,9 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
 
       // Draw Galaxy Core Glow
       const grad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, Math.min(width, height) * 0.35);
-      grad.addColorStop(0, 'rgba(6, 182, 212, 0.35)');
-      grad.addColorStop(0.3, 'rgba(59, 130, 246, 0.2)');
-      grad.addColorStop(0.7, 'rgba(139, 92, 246, 0.08)');
+      grad.addColorStop(0, palette.core0);
+      grad.addColorStop(0.3, palette.core1);
+      grad.addColorStop(0.7, palette.core2);
       grad.addColorStop(1, 'transparent');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -173,7 +192,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animId);
     };
-  }, [isWarping]);
+  }, [isWarping, activeTheme]);
 
   const handleTriggerWarp = (tab: string = 'bio') => {
     setSelectedTarget(tab);
@@ -187,7 +206,10 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
       particleCount: 120,
       spread: 100,
       origin: { y: 0.5 },
-      colors: ['#06b6d4', '#3b82f6', '#a855f7']
+      colors:
+        activeTheme === 'agriculture'
+          ? ['#5cc477', '#b5e09a', '#e3b83d', '#a3e698', '#ffffff']
+          : ['#06b6d4', '#3b82f6', '#a855f7']
     });
 
     setTimeout(() => {

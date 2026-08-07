@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 import { useLang } from '../../lib/language';
+import { useTheme } from '../../lib/theme';
 import { 
   Eye, 
   Sparkles, 
@@ -87,6 +88,7 @@ export const ObserverSecretEye: React.FC = () => {
   const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; isError: boolean } | null>(null);
   const [teleportEffect, setTeleportEffect] = useState(false);
   const { t } = useLang();
+  const { theme } = useTheme();
 
   const currentRiddle = COSMIC_RIDDLES[currentRiddleIdx];
 
@@ -115,7 +117,9 @@ export const ObserverSecretEye: React.FC = () => {
         particleCount: 100,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#06b6d4', '#10b981', '#a855f7']
+        colors: theme === 'agriculture'
+          ? ['#5cc477', '#e9b83d', '#b5e09a', '#ffffff']
+          : ['#06b6d4', '#10b981', '#a855f7']
       });
 
       setTimeout(() => {

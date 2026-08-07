@@ -43,6 +43,9 @@
   --color-slate-850: #17203a;
   --color-slate-900: #0f172a;
   --color-slate-950: #020617;
+
+  /* Ambient grid line (BackgroundGrid hardcoded color) */
+  --grid-line: rgba(56, 189, 248, 0.15);
 }
 
 :root[data-theme="agriculture"] {
@@ -80,6 +83,9 @@
   --color-slate-850: #242e26;
   --color-slate-900: #1a221b;
   --color-slate-950: #0e150e;
+
+  /* Ambient grid line -> muted leaf green */
+  --grid-line: rgba(92, 196, 119, 0.14);
 }
 
 /* Make Tailwind utilities resolve to the tokens above */

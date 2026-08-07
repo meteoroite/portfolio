@@ -121,7 +121,7 @@ export const EyeEngine: React.FC<EyeEngineProps> = ({ reducedMotion, onEyeClick,
         <div className={`relative w-4/5 h-4/5 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.9)] transition-all duration-300 ${isBlinking || isSleeping ? 'scale-y-[0.05]' : 'scale-y-100'}`}>
           
           {/* Cybernetic Grid inside Sclera */}
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:12px_12px]" />
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(var(--color-cyan-400)_1px,transparent_1px)] [background-size:12px_12px]" />
 
           {/* Iris Element (Follows Cursor) */}
           <div 
@@ -137,7 +137,7 @@ export const EyeEngine: React.FC<EyeEngineProps> = ({ reducedMotion, onEyeClick,
             <div className="absolute inset-1 rounded-full bg-slate-950 border border-cyan-300/40 flex items-center justify-center">
               
               {/* Pupil Core */}
-              <div className={`w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center shadow-[0_0_15px_#38bdf8] transition-transform duration-300 ${isHovered ? 'scale-125 bg-white' : 'scale-100'} overflow-hidden`}>
+              <div className={`w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center shadow-[0_0_15px_var(--color-cyan-400)] transition-transform duration-300 ${isHovered ? 'scale-125 bg-white' : 'scale-100'} overflow-hidden`}>
                 {BRAND_ASSETS.jarvisEye.eyeEngine ? (
                   <img 
                     src={BRAND_ASSETS.jarvisEye.eyeEngine} 

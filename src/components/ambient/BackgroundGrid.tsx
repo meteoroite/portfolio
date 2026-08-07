@@ -17,8 +17,8 @@ export const BackgroundGrid: React.FC<BackgroundGridProps> = ({ reducedMotion })
         className="absolute inset-0 opacity-[0.07]" 
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(56, 189, 248, 0.15) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(56, 189, 248, 0.15) 1px, transparent 1px)
+            linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)
           `,
           backgroundSize: '40px 40px'
         }}
