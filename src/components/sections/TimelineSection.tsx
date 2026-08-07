@@ -3,6 +3,9 @@ import { motion } from 'motion/react';
 import { TIMELINE_DATA } from '../../data/profileData';
 import { Planet3D } from '../ui/Planet3D';
 import { useLang } from '../../lib/language';
+import { useTheme } from '../../lib/theme';
+import { PlantGrowTransition, VineWeave } from '../ui/PlantGrowTransition';
+import { Leaf } from 'lucide-react';
 import { 
   Milestone, 
   GraduationCap, 
@@ -36,6 +39,8 @@ const itemVariants = {
 
 export const TimelineSection: React.FC = () => {
   const { t } = useLang();
+  const { theme } = useTheme();
+  const isAgri = theme === 'agriculture';
   const getMilestoneIcon = (type: string) => {
     switch (type) {
       case 'education': return GraduationCap;
@@ -85,16 +90,32 @@ export const TimelineSection: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Timeline Steps */}
-      <div className="relative border-l-2 border-cyan-500/30 ml-6 sm:ml-8 space-y-10 pl-6 sm:pl-10 my-6">
+      {/* Timeline Steps — the spine becomes a growing vine in agriculture mode */}
+      <div className={`relative border-l-2 ${isAgri ? 'border-emerald-500/40' : 'border-cyan-500/30'} ml-6 sm:ml-8 space-y-10 pl-6 sm:pl-10 my-6`}>
+        <VineWeave
+          d="M0,0 C 18,120 8,260 14,420 C 20,600 4,760 12,960"
+          className={`absolute left-[-29px] top-0 h-full w-6 ${isAgri ? 'opacity-70' : 'hidden'}`}
+        />
         {TIMELINE_DATA.map((item, idx) => {
           const IconComponent = getMilestoneIcon(item.type);
           return (
-            <motion.div variants={itemVariants} key={idx} className="relative group">
+            <PlantGrowTransition
+              key={idx}
+              className={isAgri ? 'block' : 'contents'}
+              leaves={
+                isAgri
+                  ? [
+                      { style: { top: '0.5rem', right: '-0.25rem' }, size: 7 },
+                      { style: { top: '1.4rem', right: '1.6rem' }, size: 5, colorClass: 'bg-emerald-400' },
+                    ]
+                  : undefined
+              }
+            >
+            <motion.div variants={itemVariants} className="relative group">
               
-              {/* Node Bullet Icon */}
-              <div className="absolute -left-[33px] sm:-left-[49px] top-1.5 w-10 h-10 rounded-full bg-slate-950 border-2 border-cyan-400 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(56,189,248,0.3)] group-hover:scale-110 transition-transform z-10">
-                <IconComponent className="w-5 h-5" />
+              {/* Node Bullet Icon — leaf sprout in agriculture mode */}
+              <div className={`absolute -left-[33px] sm:-left-[49px] top-1.5 w-10 h-10 rounded-full bg-slate-950 border-2 ${isAgri ? 'border-emerald-400 text-emerald-400' : 'border-cyan-400 text-cyan-400'} flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.3)] group-hover:scale-110 transition-transform z-10`}>
+                {isAgri ? <Leaf className="w-5 h-5" /> : <IconComponent className="w-5 h-5" />}
               </div>
 
               {/* Milestone Card */}
@@ -154,6 +175,7 @@ export const TimelineSection: React.FC = () => {
               </div>
 
             </motion.div>
+            </PlantGrowTransition>
           );
         })}
       </div>

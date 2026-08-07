@@ -4,6 +4,8 @@ import { SKILL_CATEGORIES } from '../../data/profileData';
 import { SkillCategory } from '../../types';
 import { Planet3D } from '../ui/Planet3D';
 import { useLang } from '../../lib/language';
+import { useTheme } from '../../lib/theme';
+import { PlantGrowTransition, VineWeave } from '../ui/PlantGrowTransition';
 import { 
   Code2, 
   Server, 
@@ -41,6 +43,8 @@ const itemVariants = {
 
 export const SkillsConstellation: React.FC = () => {
   const { t } = useLang();
+  const { theme } = useTheme();
+  const isAgri = theme === 'agriculture';
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -165,9 +169,19 @@ export const SkillsConstellation: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {visibleSkills.map((skill, idx) => (
+                  <PlantGrowTransition
+                    key={idx}
+                    leaves={
+                      isAgri
+                        ? [
+                            { style: { top: '0.4rem', right: '0.6rem' }, size: 6, colorClass: 'bg-emerald-400' },
+                            { style: { top: '0.2rem', right: '2rem' }, size: 5 },
+                          ]
+                        : undefined
+                    }
+                  >
                   <motion.div 
                     whileHover={{ y: -3, scale: 1.01 }}
-                    key={idx}
                     className="bg-slate-950/80 border border-slate-850 hover:border-cyan-500/40 rounded-xl p-4 space-y-2 transition-all hover:bg-slate-950 group"
                   >
                     <div className="flex items-center justify-between gap-2 font-mono">
@@ -193,6 +207,7 @@ export const SkillsConstellation: React.FC = () => {
                       </div>
                     )}
                   </motion.div>
+                  </PlantGrowTransition>
                 ))}
               </div>
             </motion.div>

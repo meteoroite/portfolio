@@ -5,6 +5,8 @@ import { PROJECTS_DATA } from '../../data/profileData';
 import { Project } from '../../types';
 import { Planet3D, getPlanetTheme } from '../ui/Planet3D';
 import { useLang } from '../../lib/language';
+import { useTheme } from '../../lib/theme';
+import { VineWeave, stemGrow } from '../ui/PlantGrowTransition';
 import { 
   FolderGit2, 
   ExternalLink, 
@@ -48,6 +50,8 @@ const itemVariants = {
 
 export const ProjectUniverse: React.FC = () => {
   const { t } = useLang();
+  const { theme } = useTheme();
+  const isAgri = theme === 'agriculture';
   const [projectsList, setProjectsList] = useState<Project[]>(PROJECTS_DATA);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   
@@ -113,7 +117,9 @@ export const ProjectUniverse: React.FC = () => {
         particleCount: 80,
         spread: 90,
         origin: { y: 0.5 },
-        colors: ['#06b6d4', '#3b82f6', '#a855f7', '#10b981']
+        colors: isAgri
+          ? ['#5cc477', '#b5e09a', '#e3b83d', '#ffffff']
+          : ['#06b6d4', '#3b82f6', '#a855f7', '#10b981']
       });
     }, 1400);
   };
@@ -374,8 +380,16 @@ export const ProjectUniverse: React.FC = () => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25, delay: idx * 0.04 }}
                   key={project.id}
+                  variants={isAgri ? stemGrow : undefined}
                   className="bg-slate-900/70 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 backdrop-blur-md space-y-4 flex flex-col justify-between transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(6,182,212,0.15)] group relative overflow-hidden"
                 >
+                  {/* Leaf + vine accent in agriculture grid view */}
+                  {isAgri && (
+                    <>
+                      <VineWeave d="M0,0 C 30,40 8,90 26,130" className="absolute top-2 right-2 w-10 h-full opacity-60 pointer-events-none" />
+                      <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse opacity-80 pointer-events-none" />
+                    </>
+                  )}
                   <div className="space-y-4">
                     {/* Header with Planet Graphic */}
                     <div className="flex items-start justify-between gap-3">
