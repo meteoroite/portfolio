@@ -13,6 +13,8 @@ export interface Project {
   metrics?: string[];
   architecture?: string;
   role: string;
+  /** Show in the agriculture theme's curated AgTech set. */
+  agri?: boolean;
 }
 
 export interface SkillCategory {
@@ -36,6 +38,8 @@ export interface TimelineMilestone {
   description: string;
   highlights: string[];
   type: 'education' | 'career' | 'military' | 'achievement';
+  /** Include in the agriculture theme's curated experience filter. */
+  agri?: boolean;
 }
 
 export interface CVVariant {

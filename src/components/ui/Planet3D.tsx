@@ -1,5 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { useTheme } from '../../lib/theme';
+import { PlantOrb } from './PlantOrb';
 
 interface Planet3DProps {
   id: string;
@@ -73,7 +75,14 @@ export const Planet3D: React.FC<Planet3DProps> = ({
   isHovered = false,
   className = '',
 }) => {
-  const theme = getPlanetTheme(id, category);
+  const { theme } = useTheme();
+  const isAgri = theme === 'agriculture';
+
+  if (isAgri) {
+    return <PlantOrb size={size} isHovered={isHovered} />;
+  }
+
+  const themeInfo = getPlanetTheme(id, category);
 
   return (
     <div
@@ -91,22 +100,22 @@ export const Planet3D: React.FC<Planet3DProps> = ({
         style={{
           width: size,
           height: size,
-          backgroundColor: theme.atmosphere,
-          boxShadow: `0 0 35px ${theme.primaryGlow}`,
+          backgroundColor: themeInfo.atmosphere,
+          boxShadow: `0 0 35px ${themeInfo.primaryGlow}`,
         }}
       />
 
       {/* Planetary Orbit Ring (If applies) */}
-      {theme.hasRings && (
+      {themeInfo.hasRings && (
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-          className={`absolute rounded-[100%] border-2 ${theme.ringColor} pointer-events-none`}
+          className={`absolute rounded-[100%] border-2 ${themeInfo.ringColor} pointer-events-none`}
           style={{
             width: size * 1.5,
             height: size * 0.5,
             transform: 'rotateX(70deg) rotateY(-15deg)',
-            boxShadow: `0 0 15px ${theme.primaryGlow}`,
+            boxShadow: `0 0 15px ${themeInfo.primaryGlow}`,
           }}
         />
       )}
@@ -121,7 +130,7 @@ export const Planet3D: React.FC<Planet3DProps> = ({
           rotate: { duration: 25, repeat: Infinity, ease: 'linear' },
           scale: { duration: 0.3 },
         }}
-        className={`rounded-full bg-gradient-to-tr ${theme.gradient} relative overflow-hidden shadow-2xl z-10 border border-white/20`}
+        className={`rounded-full bg-gradient-to-tr ${themeInfo.gradient} relative overflow-hidden shadow-2xl z-10 border border-white/20`}
         style={{
           width: size,
           height: size,

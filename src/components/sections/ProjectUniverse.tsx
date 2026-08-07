@@ -24,6 +24,7 @@ import {
   Compass,
   LayoutGrid,
   Orbit,
+  Sprout,
   ArrowRight,
   GitBranch
 } from 'lucide-react';
@@ -98,9 +99,12 @@ export const ProjectUniverse: React.FC = () => {
     }
   };
 
-  const categories = ['all', 'AI', 'Full-Stack', 'Client Work', 'Computer Vision', 'AgTech'];
+  const categories = isAgri
+      ? ['all', 'AgTech', 'AI', 'Computer Vision']
+      : ['all', 'AI', 'Full-Stack', 'Client Work', 'Computer Vision', 'AgTech'];
 
   const filteredProjects = projectsList.filter(p => {
+    if (isAgri && p.agri !== true) return false;
     if (selectedFilter === 'all') return true;
     return p.category === selectedFilter;
   });
@@ -272,13 +276,13 @@ export const ProjectUniverse: React.FC = () => {
         <div className="relative min-h-[580px] sm:min-h-[640px] bg-slate-950/90 border border-cyan-500/30 rounded-3xl p-4 sm:p-8 flex flex-col items-center justify-center overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.8)]">
           
           {/* Deep Space Starfield & Orbit Rings Background */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-950/30 via-slate-950 to-black pointer-events-none" />
+          <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] pointer-events-none ${isAgri ? 'from-amber-500/20 via-slate-950 to-black' : 'from-blue-950/30 via-slate-950 to-black'}`} />
 
           {/* Concentric Orbit Rings */}
           {[180, 290, 400, 510].map((radius, idx) => (
             <div
               key={idx}
-              className="absolute rounded-full border border-cyan-500/15 pointer-events-none"
+              className={`absolute rounded-full border pointer-events-none ${isAgri ? 'border-emerald-500/20' : 'border-cyan-500/15'}`}
               style={{
                 width: radius,
                 height: radius,
@@ -289,23 +293,52 @@ export const ProjectUniverse: React.FC = () => {
           {/* Central Sun: MAHMOUD SYSTEM ARCHITECTURE CORE */}
           <div className="relative z-20 flex flex-col items-center justify-center group cursor-pointer mb-8 sm:mb-0">
             <motion.div
-              animate={{
-                scale: [1, 1.08, 1],
-                boxShadow: [
-                  '0 0 35px rgba(6,182,212,0.4)',
-                  '0 0 65px rgba(59,130,246,0.7)',
-                  '0 0 35px rgba(6,182,212,0.4)',
-                ],
-              }}
+              animate={
+                isAgri
+                  ? {
+                      scale: [1, 1.08, 1],
+                      boxShadow: [
+                        '0 0 35px rgba(233,184,61,0.45)',
+                        '0 0 65px rgba(255,221,138,0.6)',
+                        '0 0 35px rgba(233,184,61,0.45)',
+                      ],
+                    }
+                  : {
+                      scale: [1, 1.08, 1],
+                      boxShadow: [
+                        '0 0 35px rgba(6,182,212,0.4)',
+                        '0 0 65px rgba(59,130,246,0.7)',
+                        '0 0 35px rgba(6,182,212,0.4)',
+                      ],
+                    }
+              }
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-900 border-2 border-white/40 flex flex-col items-center justify-center text-center p-2 relative shadow-2xl"
+              className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 flex flex-col items-center justify-center text-center p-2 relative shadow-2xl overflow-visible ${
+                isAgri
+                  ? 'bg-gradient-to-tr from-amber-300 via-yellow-500 to-amber-700 border-yellow-200/70'
+                  : 'bg-gradient-to-tr from-cyan-400 via-blue-600 to-indigo-900 border-white/40'
+              }`}
             >
-              <Cpu className="w-8 h-8 text-white animate-pulse" />
-              <span className="text-[9px] font-mono font-bold text-cyan-200 mt-1 uppercase tracking-tighter">
+              {/* Sun rays */}
+              {isAgri && (
+                <motion.div
+                  className="absolute inset-0 rounded-full pointer-events-none"
+                  style={{
+                    background:
+                      'repeating-conic-gradient(rgba(255,221,138,0.28) 0deg 22deg, transparent 22deg 45deg)',
+                  }}
+                />
+              )}
+              {isAgri ? (
+                <Sprout className="w-8 h-8 text-white animate-pulse" />
+              ) : (
+                <Cpu className="w-8 h-8 text-white animate-pulse" />
+              )}
+              <span className={`text-[9px] font-mono font-bold mt-1 uppercase tracking-tighter ${isAgri ? 'text-amber-50' : 'text-cyan-200'}`}>
                 {t.projectsCoreArch}
               </span>
             </motion.div>
-            <div className="mt-2 bg-slate-950/90 border border-cyan-500/40 px-3 py-1 rounded-full text-[10px] font-mono text-cyan-300 font-bold shadow-md">
+            <div className={`mt-2 bg-slate-950/90 border px-3 py-1 rounded-full text-[10px] font-mono font-bold shadow-md ${isAgri ? 'border-amber-400/50 text-amber-300' : 'border-cyan-500/40 text-cyan-300'}`}>
               {t.projectsMahmoudCore}
             </div>
           </div>

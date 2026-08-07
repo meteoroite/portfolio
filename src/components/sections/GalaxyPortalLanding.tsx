@@ -21,6 +21,7 @@ import {
   Zap,
   Globe,
   Compass,
+  Sprout,
   ArrowRight
 } from 'lucide-react';
 
@@ -31,6 +32,7 @@ interface GalaxyPortalLandingProps {
 export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnterGalaxy }) => {
   const { t } = useLang();
   const { theme: activeTheme } = useTheme();
+  const isAgri = activeTheme === 'agriculture';
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isWarping, setIsWarping] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState<string>('bio');
@@ -82,7 +84,7 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
     const isAgri = activeTheme === 'agriculture';
     const palette = isAgri
       ? {
-          fade: 'rgba(12, 18, 12, 0.25)',
+          fade: 'rgba(12, 18, 12, 0.35)',
           stars: ['#5cc477', '#b5e09a', '#e3b83d', '#a3e698', '#ffffff', '#8fd67f'],
           core0: 'rgba(92, 196, 119, 0.35)',
           core1: 'rgba(179, 224, 154, 0.2)',
@@ -103,8 +105,53 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
     };
     window.addEventListener('resize', handleResize);
 
-    // Galaxy particle setup
-    const starCount = 350;
+    // ---- Agriculture: sun + crop field setup ----
+    const stems: Array<{
+      baseX: number;
+      baseY: number;
+      height: number;
+      swayPhase: number;
+      swaySpeed: number;
+      lean: number;
+      hue: string;
+    }> = [];
+
+    if (isAgri) {
+      const grainCount = 240;
+      for (let i = 0; i < grainCount; i++) {
+        const y = height * (0.18 + Math.random() * 0.62);
+        stems.push({
+          baseX: Math.random() * width,
+          baseY: y,
+          height: (28 + Math.random() * 52) * (0.5 + y / height),
+          swayPhase: Math.random() * Math.PI * 2,
+          swaySpeed: 0.6 + Math.random() * 1.1,
+          lean: -0.25 + Math.random() * 0.5,
+          hue: ['#5cc273', '#7fd987', '#a3e698', '#b5e09a', '#cfe8a6'][Math.floor(Math.random() * 5)],
+        });
+      }
+    }
+
+    const pollen: Array<{ x: number; y: number; r: number; vx: number; vy: number; c: string; a: number }> = [];
+    if (isAgri) {
+      const pc = 90;
+      const pcols = ['#e9d26b', '#f2df9a', '#bfe8a8', '#ffffff'];
+      for (let i = 0; i < pc; i++) {
+        pollen.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: 0.6 + Math.random() * 1.8,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: -0.15 - Math.random() * 0.5,
+          c: pcols[Math.floor(Math.random() * pcols.length)],
+          a: 0.3 + Math.random() * 0.5,
+        });
+      }
+    }
+
+    let warpSpeed = 1;
+    let time = 0;
+
     const stars: Array<{
       x: number;
       y: number;
@@ -115,32 +162,125 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
       radius: number;
       color: string;
     }> = [];
-
-    const colors = palette.stars;
-
-    for (let i = 0; i < starCount; i++) {
-      const distance = Math.pow(Math.random(), 1.8) * Math.min(width, height) * 0.45 + 20;
-      const angle = Math.random() * Math.PI * 2;
-      stars.push({
-        x: 0,
-        y: 0,
-        z: Math.random() * 1000,
-        angle,
-        distance,
-        speed: (0.002 + Math.random() * 0.003) * (distance < 100 ? 1.5 : 0.8),
-        radius: Math.random() * 1.8 + 0.6,
-        color: colors[Math.floor(Math.random() * colors.length)],
-      });
+    if (!isAgri) {
+      const colors = palette.stars;
+      const starCount = 350;
+      for (let i = 0; i < starCount; i++) {
+        const distance = Math.pow(Math.random(), 1.8) * Math.min(width, height) * 0.45 + 20;
+        const angle = Math.random() * Math.PI * 2;
+        stars.push({
+          x: 0, y: 0, z: Math.random() * 1000, angle, distance,
+          speed: (0.002 + Math.random() * 0.003) * (distance < 100 ? 1.5 : 0.8),
+          radius: Math.random() * 1.8 + 0.6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+        });
+      }
     }
-
-    let warpSpeed = 1;
 
     const render = () => {
       ctx.fillStyle = palette.fade;
       ctx.fillRect(0, 0, width, height);
+      time += 0.016;
 
       const centerX = width / 2;
       const centerY = height / 2;
+
+      if (isAgri) {
+        // ---- Animated Sun with rotating rays ----
+        const sunX = centerX;
+        const sunY = height * 0.3;
+        const sunR = Math.min(width, height) * 0.13;
+
+        const sunCore = ctx.createRadialGradient(sunX, sunY, 4, sunX, sunY, sunR * 1.6);
+        sunCore.addColorStop(0, 'rgba(255, 244, 209, 0.95)');
+        sunCore.addColorStop(0.35, 'rgba(255, 221, 138, 0.75)');
+        sunCore.addColorStop(0.7, 'rgba(233, 184, 61, 0.25)');
+        sunCore.addColorStop(1, 'transparent');
+        ctx.fillStyle = sunCore;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, sunR * 1.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rotating sunlight rays
+        ctx.save();
+        ctx.translate(sunX, sunY);
+        ctx.rotate(time * 0.15);
+        for (let i = 0; i < 12; i++) {
+          ctx.rotate((Math.PI * 2) / 12);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(sunR * 1.3, -3);
+          ctx.lineTo(sunR * 1.6, 0);
+          ctx.lineTo(sunR * 1.3, 3);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(255, 221, 138, 0.22)';
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Golden horizon
+        const horizonY = height * 0.72;
+        const hgrad = ctx.createLinearGradient(0, height * 0.55, 0, height);
+        hgrad.addColorStop(0, 'rgba(233, 184, 61, 0.05)');
+        hgrad.addColorStop(0.35, 'rgba(67, 171, 95, 0.08)');
+        hgrad.addColorStop(1, 'rgba(18, 43, 28, 0.85)');
+        ctx.fillStyle = hgrad;
+        ctx.fillRect(0, horizonY - 20, width, height - horizonY + 20);
+
+        // --- Swaying crop stems ----
+        for (const s of stems) {
+          const sway = Math.sin(time * s.swaySpeed + s.swayPhase) * 5;
+          const tipX = s.baseX + sway;
+          const tipY = s.baseY - s.height;
+          ctx.beginPath();
+          ctx.moveTo(s.baseX, s.baseY);
+          ctx.quadraticCurveTo(
+            s.baseX + sway * 0.4,
+            s.baseY - s.height * 0.6,
+            tipX,
+            tipY
+          );
+          ctx.strokeStyle = s.hue;
+          ctx.globalAlpha = 0.5 + Math.random() * 0.3;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+
+          // Grain head (arc of seeds at top)
+          ctx.beginPath();
+          ctx.arc(tipX, tipY, 2.4, Math.PI, 0);
+          ctx.fillStyle = '#e9d26b';
+          ctx.fill();
+
+          // A few other seed dots
+          ctx.beginPath();
+          ctx.arc(tipX - 2.4, tipY - 1, 1.6, 0, Math.PI * 2);
+          ctx.fillStyle = '#e3b83d';
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(tipX + 2.4, tipY - 0.5, 1.6, 0, Math.PI * 2);
+          ctx.fillStyle = '#d9c56a';
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // --- Drifting pollen / fireflies ---
+        for (const p of pollen) {
+          p.x += p.vx + Math.sin(time + p.y * 0.01) * 0.15;
+          p.y += p.vy;
+          if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
+          if (p.x < -10) p.x = width + 10;
+          if (p.x > width + 10) p.x = -10;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.c;
+          ctx.globalAlpha = p.a;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        animId = requestAnimationFrame(render);
+        return;
+      }
 
       // Draw Galaxy Core Glow
       const grad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, Math.min(width, height) * 0.35);
@@ -217,14 +357,23 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
     }, 1500);
   };
 
-  const celestialDestinations = [
-    { id: 'bio', label: t.galaxyCoreIdentity, desc: t.galaxyCoreIdentityDesc, icon: Orbit, planetColor: 'from-cyan-400 to-blue-600' },
-    { id: 'projects', label: t.galaxyProjectPlanets, desc: t.galaxyProjectPlanetsDesc, icon: FolderGit2, planetColor: 'from-purple-400 to-indigo-700' },
-    { id: 'capabilities', label: t.galaxySkillConstellations, desc: t.galaxySkillConstellationsDesc, icon: Layers, planetColor: 'from-emerald-400 to-teal-700' },
-    { id: 'timeline', label: t.galaxyTimeWarpLogs, desc: t.galaxyTimeWarpLogsDesc, icon: Milestone, planetColor: 'from-amber-400 to-orange-600' },
-    { id: 'cv', label: t.galaxyHoloArchive, desc: t.galaxyHoloArchiveDesc, icon: FileText, planetColor: 'from-blue-400 to-cyan-700' },
-    { id: 'contact', label: t.galaxySubSpaceLink, desc: t.galaxySubSpaceLinkDesc, icon: Send, planetColor: 'from-fuchsia-400 to-pink-600' },
-  ];
+  const celestialDestinations = isAgri
+    ? [
+        { id: 'bio', label: t.galaxyCoreIdentity, desc: t.galaxyCoreIdentityDesc, icon: Orbit, planetColor: 'from-cyan-400 to-blue-600' },
+        { id: 'projects', label: t.galaxyProjectPlanets, desc: t.galaxyProjectPlanetsDesc, icon: Sprout, planetColor: 'from-emerald-400 to-green-700' },
+        { id: 'capabilities', label: t.galaxySkillConstellations, desc: t.galaxySkillConstellationsDesc, icon: Layers, planetColor: 'from-amber-400 to-yellow-600' },
+        { id: 'timeline', label: t.galaxyTimeWarpLogs, desc: t.galaxyTimeWarpLogsDesc, icon: Milestone, planetColor: 'from-amber-400 to-emerald-600' },
+        { id: 'cv', label: t.galaxyHoloArchive, desc: t.galaxyHoloArchiveDesc, icon: FileText, planetColor: 'from-amber-400 to-green-600' },
+        { id: 'contact', label: t.galaxySubSpaceLink, desc: t.galaxySubSpaceLinkDesc, icon: Send, planetColor: 'from-amber-400 to-amber-600' },
+      ]
+    : [
+        { id: 'bio', label: t.galaxyCoreIdentity, desc: t.galaxyCoreIdentityDesc, icon: Orbit, planetColor: 'from-cyan-400 to-blue-600' },
+        { id: 'projects', label: t.galaxyProjectPlanets, desc: t.galaxyProjectPlanetsDesc, icon: FolderGit2, planetColor: 'from-purple-400 to-indigo-700' },
+        { id: 'capabilities', label: t.galaxySkillConstellations, desc: t.galaxySkillConstellationsDesc, icon: Layers, planetColor: 'from-emerald-400 to-teal-700' },
+        { id: 'timeline', label: t.galaxyTimeWarpLogs, desc: t.galaxyTimeWarpLogsDesc, icon: Milestone, planetColor: 'from-amber-400 to-orange-600' },
+        { id: 'cv', label: t.galaxyHoloArchive, desc: t.galaxyHoloArchiveDesc, icon: FileText, planetColor: 'from-blue-400 to-cyan-700' },
+        { id: 'contact', label: t.galaxySubSpaceLink, desc: t.galaxySubSpaceLinkDesc, icon: Send, planetColor: 'from-fuchsia-400 to-pink-600' },
+      ];
 
   return (
     <div className="fixed inset-0 z-[58] bg-[var(--bg-root)] text-white font-mono flex flex-col overflow-hidden selection:bg-cyan-500 selection:text-slate-950">
@@ -346,15 +495,15 @@ export const GalaxyPortalLanding: React.FC<GalaxyPortalLandingProps> = ({ onEnte
             </div>
           </div>
 
-          {/* Big Action Hyper-Drive Button */}
+{/* Big Action Hyper-Drive Button */}
           <div className="pt-2">
             <button
               onClick={() => handleTriggerWarp('bio')}
               disabled={isWarping}
               className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-sm sm:text-base shadow-[0_0_40px_rgba(6,182,212,0.5)] transition-all transform hover:scale-105 active:scale-95"
             >
-              <Rocket className="w-5 h-5 animate-bounce text-cyan-200" />
-              <span>{isWarping ? t.galaxyWarping : t.galaxyEnter}</span>
+              {isAgri ? <Sprout className="w-5 h-5 animate-bounce text-emerald-200" /> : <Rocket className="w-5 h-5 animate-bounce text-cyan-200" />}
+              <span>{isWarping ? (isAgri ? t.galaxyWarping : t.galaxyWarping) : (isAgri ? t.galaxyEnter : t.galaxyEnter)}</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>

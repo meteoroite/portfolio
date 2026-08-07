@@ -41,6 +41,7 @@ export const TimelineSection: React.FC = () => {
   const { t } = useLang();
   const { theme } = useTheme();
   const isAgri = theme === 'agriculture';
+  const timeline = isAgri ? TIMELINE_DATA.filter(item => item.agri === true) : TIMELINE_DATA;
   const getMilestoneIcon = (type: string) => {
     switch (type) {
       case 'education': return GraduationCap;
@@ -96,7 +97,7 @@ export const TimelineSection: React.FC = () => {
           d="M0,0 C 18,120 8,260 14,420 C 20,600 4,760 12,960"
           className={`absolute left-[-29px] top-0 h-full w-6 ${isAgri ? 'opacity-70' : 'hidden'}`}
         />
-        {TIMELINE_DATA.map((item, idx) => {
+        {timeline.map((item, idx) => {
           const IconComponent = getMilestoneIcon(item.type);
           return (
             <PlantGrowTransition

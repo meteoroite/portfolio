@@ -71,8 +71,9 @@ export const PROJECTS_DATA: Project[] = [
     id: "ai-agent-factory",
     title: "AI Agent Factory Engine",
     category: "AI",
+    agri: true,
     shortDesc: "Orchestration framework for dynamically instantiating, testing, and deploying specialized LLM agents.",
-    fullDesc: "Modular platform enabling the creation of single-purpose and multi-agent teams with customizable system prompts, tool bindings, and vector memory instances.",
+    fullDesc: "Modular platform enabling the creation of single-purpose and multi-agent teams with customizable system prompts, tool bindings, and vector memory instances. Configurable for domain agents that assist farmers with pest diagnostics, irrigation scheduling, and market-price intelligence.",
     stack: ["Python", "CrewAI", "LangChain", "FastAPI", "Ollama", "Docker"],
     status: "Paused",
     keyLesson: "Reusable abstractions and standard tool definitions are essential when scaling from 1 agent to 100.",
@@ -98,8 +99,9 @@ export const PROJECTS_DATA: Project[] = [
     id: "computer-vision-input",
     title: "Hand Gesture Keyboard & Eye Mouse",
     category: "Computer Vision",
+    agri: true,
     shortDesc: "Human-Computer Interaction (HCI) software mapping facial eye-tracking and hand gestures to OS input controls.",
-    fullDesc: "Accessible HCI solutions utilizing OpenCV and MediaPipe to convert real-time camera feeds into precise mouse cursor movements and gesture-triggered virtual key strokes.",
+    fullDesc: "Accessible HCI solutions utilizing OpenCV and MediaPipe to convert real-time camera feeds into precise mouse cursor movements and gesture-triggered virtual key strokes. The same vision pipeline concepts are directly applicable to precision-agri machinery control and operator HMI systems.",
     stack: ["Python", "OpenCV", "MediaPipe", "PyAutoGUI", "NumPy"],
     status: "Completed",
     keyLesson: "Real-time computer vision requires aggressive frame-buffering and noise smoothing for usable UX.",
@@ -134,6 +136,50 @@ export const PROJECTS_DATA: Project[] = [
     role: "Sole Developer",
     metrics: ["Responsive Mobile Audio UX", "PWA Ready"],
     repoUrl: "https://github.com/meteoroite/holy-quran"
+  },
+  {
+    id: "precision-farm-vision",
+    title: "Precision Farming Vision Suite",
+    category: "AgTech",
+    agri: true,
+    shortDesc: "Edge-based computer vision suite for crop health monitoring, pest detection, and automated weed discrimination.",
+    fullDesc: "Precision agriculture platform combining YOLO/CNN detection models with HSV color-space segmentation to identify crop stress, classify pest infestations early, and differentiate crops from invasive weeds before visual decay spreads across fields. Runs on Jetson-class edge hardware for low-latency in-field inference with offline reliability.",
+    stack: ["Python", "OpenCV", "YOLO", "MediaPipe", "Jetson Orin", "TensorRT"],
+    status: "Active",
+    keyLesson: "Early pest detection requires fusing spectral segmentation with deep detectors — color cues alone are too noisy outdoors.",
+    featured: true,
+    role: "AgTech Vision Architect",
+    metrics: ["Early Pest Detection", "Edge Inference Offline", "Weed Discrimination"],
+    repoUrl: "https://github.com/meteoroite"
+  },
+  {
+    id: "smart-irrigation-agent",
+    title: "Smart Irrigation AI Scheduler",
+    category: "AgTech",
+    agri: true,
+    shortDesc: "Data-driven irrigation scheduler using soil-moisture telemetry, weather forecasting, and LLM agents to cut water waste.",
+    fullDesc: "End-to-end irrigation intelligence that ingests soil-moisture sensor telemetry and weather forecasts to recommend precise watering windows. An LLM agent layer explains recommendations in plain language and adapts schedules to crop type, growth stage, and local evaporation rates — reducing water consumption without sacrificing yield.",
+    stack: ["Python", "FastAPI", "Ollama", "Qdrant", "MQTT", "Docker"],
+    status: "Active",
+    keyLesson: "Agents must be bounded by hard telemetry validation — never let a hallucinated forecast override a real sensor reading.",
+    featured: true,
+    role: "AI Systems Lead",
+    metrics: ["Up to 30% Water Saved", "Real-Time Sensor Fusion"],
+    repoUrl: "https://github.com/meteoroite"
+  },
+  {
+    id: "agro-saas-marketplace",
+    title: "AgroLink SaaS Marketplace",
+    category: "AgTech",
+    agri: true,
+    shortDesc: "SaaS marketplace connecting smallholder farmers with buyers, agronomy services, and micro-finance options.",
+    fullDesc: "Full-stack SaaS platform that lets smallholder farmers list harvests, connect with verified buyers, and access agronomy advisory subscriptions and micro-finance lenders. Includes role-based dashboards for farmers, buyers, and extension officers, with Arabic/English localization for regional adoption.",
+    stack: ["React", "TypeScript", "Node.js", "Express", "MongoDB", "Socket.IO", "Docker"],
+    status: "Completed",
+    keyLesson: "Trust and verification pipelines matter more than features when onboarding rural farming communities.",
+    featured: true,
+    role: "Full-Stack Founder & Architect",
+    metrics: ["AR/EN Localization", "RBAC Multi-Role Portals"]
   }
 ];
 
@@ -220,6 +266,7 @@ export const TIMELINE_DATA: TimelineMilestone[] = [
     title: "B.Sc. Agricultural Engineering & Full-Stack Expansion",
     role: "Engineering Student & Developer",
     organization: "Tanta University",
+    agri: true,
     description: "Earned B.Sc. in Agricultural Engineering while simultaneously engineering complex full-stack applications, health cards, computer vision gesture systems, and MERN apps.",
     highlights: [
       "Graduated in June 2024 with Agricultural Engineering Degree",
@@ -248,6 +295,7 @@ export const TIMELINE_DATA: TimelineMilestone[] = [
     period: "2026 - Future",
     title: "AI & Full-Stack Engineering Leadership",
     role: "Software / AI Engineer & Founder",
+    agri: true,
     description: "Actively delivering production-oriented software, local LLM orchestration tools, and client solutions. Combining Agricultural Engineering discipline with scalable AI products.",
     highlights: [
       "Building JARVIS Local AI assistant platform",
