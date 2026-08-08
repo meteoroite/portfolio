@@ -1,59 +1,71 @@
-import { Redis } from '@upstash/redis';
-
 /**
- * Persistent KV store (Upstash / Vercel KV).
- * Falls back to an in-memory Map when env keys are missing so the app
- * still works locally / before env config. The refresh of the Redis client
- * is cheap (lazy), so we build it once per cold start.
+ * Persistent KV store backed by an Upstash / Vercel-KV REST endpoint.
+ * No SDK dependency: sends the raw Redis command as a JSON array via
+ * POST + Authorization header (the documented body-style REST API), which
+ * avoids URL-encoding issues for large JSON values like full blog posts.
+ *
+ * Falls back to an in-memory Map when env keys are missing so the app still
+ * works locally / before env config (ephemeral).
  */
-const URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
+const REST_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
 const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_API_TOKEN || '';
 
-export const kvConfigured: boolean = Boolean(URL && TOKEN);
-
-let redis: Redis | null = null;
-function client(): Redis | null {
-  if (!kvConfigured) return null;
-  redis = redis ?? new Redis({
-    url: URL,
-    token: TOKEN,
-    automaticDeserialization: false,
-  });
-  return redis;
-}
+export const kvConfigured: boolean = Boolean(REST_URL && TOKEN);
 
 const mem = new Map<string, string>();
 
-export async function kvGet<T>(key: string): Promise<T | null> {
-  const c = client();
-  if (c) {
-    const v = await c.get(key);
-    if (v === null || v === undefined) return null;
-    return typeof v === 'string' ? (JSON.parse(v) as T) : (v as T);
+interface UpstashResponse { result: string | null | number; error?: string | null }
+
+export async function command(cmd: string, args: unknown[]): Promise<UpstashResponse | null> {
+  if (!kvConfigured) return null;
+  try {
+    const body = JSON.stringify([cmd, ...args]);
+    const res = await fetch(REST_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${TOKEN}`,
+      },
+      body,
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as UpstashResponse;
+  } catch {
+    return null;
   }
-  const raw = mem.get(key);
-  return raw ? (JSON.parse(raw) as T) : null;
+}
+
+export async function kvGet<T>(key: string): Promise<T | null> {
+  if (kvConfigured) {
+    const r = await command('get', [key]);
+    if (!r || r.result === null || r.result === undefined) return null;
+    const value = String(r.result);
+    try {
+      return JSON.parse(value) as T;
+    } catch {
+      return value as unknown as T;
+    }
+  }
+  const rawMem = mem.get(key);
+  return rawMem ? (JSON.parse(rawMem) as T) : null;
 }
 
 export async function kvSet<T>(key: string, value: T): Promise<void> {
-  const c = client();
-  if (c) {
-    await c.set(key, JSON.stringify(value));
+  if (kvConfigured) {
+    await command('set', [key, JSON.stringify(value)]);
   } else {
     mem.set(key, JSON.stringify(value));
   }
 }
 
 export async function kvDel(key: string): Promise<void> {
-  const c = client();
-  if (c) {
-    await c.del(key);
+  if (kvConfigured) {
+    await command('del', [key]);
   } else {
     mem.delete(key);
   }
 }
 
 export async function kvExists(key: string): Promise<boolean> {
-  const v = await kvGet(key);
-  return v !== null && v !== undefined;
+  return (await kvGet(key)) !== null;
 }
