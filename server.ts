@@ -2,9 +2,11 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
-import { PERSONAL_INFO, PROJECTS_DATA, SKILL_CATEGORIES, TIMELINE_DATA, CV_VARIANTS, INITIAL_POSTS_DATA } from "./src/data/profileData";
+import { PERSONAL_INFO, PROJECTS_DATA, SKILL_CATEGORIES, TIMELINE_DATA, CV_VARIANTS } from "./src/data/profileData";
 import { Project, BlogPost, Comment } from "./src/types";
 import { logger } from "./src/lib/logger";
+import { listRepos, fetchReadme, postFromRepo, githubConfigured, repoHasReadme, RepoInfo } from "./api/lib/github";
+import { loadPosts, savePosts } from "./api/lib/posts";
 
 async function startServer() {
   const app = express();
@@ -12,9 +14,9 @@ async function startServer() {
 
   app.use(express.json({ limit: "2mb" }));
 
-  // In-memory databases for dynamic projects and blog posts
+  // In-memory databases for dynamic projects and blog posts (posts persist to KV when configured)
   let dynamicProjects: Project[] = [...PROJECTS_DATA];
-  let dynamicPosts: BlogPost[] = JSON.parse(JSON.stringify(INITIAL_POSTS_DATA));
+  let dynamicPosts: BlogPost[] = await loadPosts();
 
   // Admin secret key (fail-closed: no env var => no admin access)
   const ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || null;
@@ -117,7 +119,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/posts", requireAdmin, (req, res) => {
+  app.post("/api/posts", requireAdmin, async (req, res) => {
     const newPost: BlogPost = req.body.post;
     if (!newPost || !newPost.title || !newPost.content) {
       res.status(400).json({ success: false, error: "Missing required blog post fields" });
@@ -137,10 +139,11 @@ async function startServer() {
       author: newPost.author || PERSONAL_INFO.name
     };
     dynamicPosts.unshift(createdPost);
+    await savePosts(dynamicPosts);
     res.json({ success: true, post: createdPost, posts: dynamicPosts });
   });
 
-  app.put("/api/posts/:id", requireAdmin, (req, res) => {
+  app.put("/api/posts/:id", requireAdmin, async (req, res) => {
     const { id } = req.params;
     const updatedData: Partial<BlogPost> = req.body.post;
     const index = dynamicPosts.findIndex(p => p.id === id);
@@ -149,17 +152,19 @@ async function startServer() {
       return;
     }
     dynamicPosts[index] = { ...dynamicPosts[index], ...updatedData };
+    await savePosts(dynamicPosts);
     res.json({ success: true, post: dynamicPosts[index], posts: dynamicPosts });
   });
 
-  app.delete("/api/posts/:id", requireAdmin, (req, res) => {
+  app.delete("/api/posts/:id", requireAdmin, async (req, res) => {
     const { id } = req.params;
     dynamicPosts = dynamicPosts.filter(p => p.id !== id);
+    await savePosts(dynamicPosts);
     res.json({ success: true, posts: dynamicPosts });
   });
 
   // Visitor Post Interactions: Like
-  app.post("/api/posts/:id/like", (req, res) => {
+  app.post("/api/posts/:id/like", async (req, res) => {
     const { id } = req.params;
     const post = dynamicPosts.find(p => p.id === id);
     if (!post) {
@@ -167,11 +172,12 @@ async function startServer() {
       return;
     }
     post.likes += 1;
+    await savePosts(dynamicPosts);
     res.json({ success: true, likes: post.likes });
   });
 
   // Visitor Post Interactions: Comment
-  app.post("/api/posts/:id/comments", (req, res) => {
+  app.post("/api/posts/:id/comments", async (req, res) => {
     const { id } = req.params;
     const { author, text } = req.body;
     if (!text || typeof text !== "string") {
@@ -191,7 +197,93 @@ async function startServer() {
       likes: 0
     };
     post.comments.push(newComment);
+    await savePosts(dynamicPosts);
     res.json({ success: true, comment: newComment, comments: post.comments });
+  });
+
+  // --- GITHUB AUTOMATION API ROUTES (dev parity) ---
+  const decorateRepos = async (repos: RepoInfo[]) => {
+    const byRepo = new Map<string, BlogPost>();
+    dynamicPosts.forEach((p) => { if (p.sourceRepo) byRepo.set(p.sourceRepo.toLowerCase(), p); });
+    return Promise.all(repos.map(async (repo) => {
+      const existing = byRepo.get(repo.full_name.toLowerCase());
+      const hasReadme = await repoHasReadme(repo.full_name);
+      let stale = false;
+      if (existing) {
+        const postTs = new Date(existing.date + 'T00:00:00Z').getTime();
+        const repoTs = new Date(repo.updated_at).getTime();
+        stale = hasReadme ? repoTs > postTs + 1000 * 60 * 60 * 24 : false;
+      }
+      return { ...repo, has_readme: hasReadme, postId: existing ? existing.id : null, postStale: stale };
+    }));
+  };
+
+app.get("/api/github", async (req, res) => {
+    try {
+      const data = (await listRepos()).filter((r) => !r.archived);
+      const decorated = await decorateRepos(data);
+      res.json({ success: true, tokenConfigured: githubConfigured, kv: Boolean(process.env.KV_UPSTASH_REDIS_REST_URL), privateLocked: !githubConfigured, repos: decorated });
+    } catch (err) {
+      res.status(500).json({ success: false, error: String(err?.message || err) });
+    }
+  });
+
+  app.post("/api/github", requireAdmin, async (req, res) => {
+    const body = req.body || {};
+    // Bulk sync: generate posts from README for all repos without a post yet
+    if (body.action === 'sync') {
+      try {
+        const raw = (await listRepos()).filter((r) => !r.archived && !r.fork);
+        const withRepo = new Set(dynamicPosts.map((p) => p.sourceRepo?.toLowerCase()).filter(Boolean));
+        const missing = raw.filter((r) => !withRepo.has(r.full_name.toLowerCase()));
+        const created: BlogPost[] = [];
+        const skipped: string[] = [];
+        let failed = 0;
+        for (const repo of missing) {
+          try {
+            const readme = await fetchReadme(repo.full_name);
+            if (!readme) { skipped.push(repo.full_name); continue; }
+            created.push(postFromRepo(repo, readme));
+          } catch { failed++; }
+        }
+        dynamicPosts = [...created, ...dynamicPosts];
+        await savePosts(dynamicPosts);
+        res.json({ success: true, scanned: raw.length, created: created.length, skippedNoReadme: skipped, failed, posts: dynamicPosts });
+        return;
+      } catch (err) {
+        res.status(500).json({ success: false, error: String(err?.message || err) });
+        return;
+      }
+    }
+
+    // Single repo → post generate/regenerate
+    const repoName = typeof body.repo === 'string' ? body.repo : '';
+    if (!repoName) { res.status(400).json({ success: false, error: 'Missing repo (owner/name)' }); return; }
+    try {
+      const raw = (await listRepos()).find((r) => r.full_name.toLowerCase() === repoName.toLowerCase());
+      const readme = await fetchReadme(repoName);
+      const source: RepoInfo = raw || { name: repoName.split('/').pop() || repoName, full_name: repoName, html_url: `https://github.com/${repoName}`, private: false, description: null, language: null, stargazers_count: 0, forks_count: 0, updated_at: new Date().toISOString(), created_at: new Date().toISOString(), archived: false, fork: false, topics: [], has_readme: readme !== null, postId: null, postStale: false };
+      const post = postFromRepo(source, readme || '');
+      const existing = dynamicPosts.find((p) => p.sourceRepo && p.sourceRepo.toLowerCase() === repoName.toLowerCase());
+      if (existing) {
+        dynamicPosts = dynamicPosts.map((p) => p.id === existing.id ? { ...p, ...post, id: existing.id, likes: p.likes, comments: p.comments } : p);
+      } else {
+        dynamicPosts.unshift(post);
+      }
+      await savePosts(dynamicPosts);
+      res.json({ success: true, created: !existing, updated: Boolean(existing), post: existing ? dynamicPosts.find((p) => p.id === existing.id) : post, posts: dynamicPosts });
+    } catch (err) {
+      res.status(500).json({ success: false, error: String(err?.message || err) });
+    }
+  });
+
+  app.delete("/api/github", requireAdmin, async (req, res) => {
+    const postId = typeof req.body?.postId === 'string' ? req.body.postId : '';
+    const target = dynamicPosts.find((p) => p.id === postId);
+    const next = target && target.sourceRepo ? dynamicPosts.filter((p) => p.id !== postId) : dynamicPosts;
+    dynamicPosts = next;
+    await savePosts(dynamicPosts);
+    res.json({ success: true, removed: Boolean(target && target.sourceRepo), message: target && target.sourceRepo ? 'Generated post removed' : 'Nothing removed (manual posts are not deleted here)', posts: next });
   });
 
   // Contact Form Dispatch API Route

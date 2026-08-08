@@ -71,6 +71,10 @@ export interface BlogPost {
   comments: Comment[];
   status: 'published' | 'draft';
   author: string;
+  /** Repo (full_name) this post was auto-generated from, when it came from a GitHub README. */
+  sourceRepo?: string;
+  /** Whether the source repo content changed after generation (stale = needs regenerate). */
+  sourceStale?: boolean;
 }
 
 export interface JARVISMessage {

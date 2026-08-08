@@ -14,7 +14,11 @@ import {
   Database,
   Globe,
   Box,
-  Cpu
+  Cpu,
+  Lock,
+  FileText,
+  LockKeyhole,
+  Loader2
 } from 'lucide-react';
 
 interface GitHubRepo {
@@ -26,9 +30,14 @@ interface GitHubRepo {
   stargazers_count: number;
   forks_count: number;
   updated_at: string;
+  created_at: string;
   archived: boolean;
   fork: boolean;
+  private: boolean;
   topics: string[];
+  has_readme: boolean;
+  postId: string | null;
+  postStale: boolean;
 }
 
 const LANGUAGE_COLORS: Record<string, string> = {
@@ -49,6 +58,8 @@ const LANGUAGE_COLORS: Record<string, string> = {
   Java: '#b07219',
   Kotlin: '#A97BFF',
   Swift: '#F05138',
+  C: '#555555',
+  'C++ ': '#f34b7d',
 };
 
 const repoCategoryIcon = (repo: GitHubRepo) => {
@@ -78,19 +89,17 @@ export const GitHubReposSection: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPrivate, setShowPrivate] = useState(true);
+  const [generating, setGenerating] = useState<string | null>(null);
 
   const fetchRepos = async () => {
     setLoading(true);
     setError(false);
     try {
-      const username = PERSONAL_INFO.github.replace(/\/$/, '').split('/').pop() || 'meteoroite';
-      const res = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100&type=all`);
-      if (!res.ok) throw new Error('GitHub API error');
-      const data: GitHubRepo[] = await res.json();
-      const publicActive = data
-        .filter((r) => !r.fork && !r.archived)
-        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
-      setRepos(publicActive);
+      const res = await fetch('/api/github');
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      setRepos(Array.isArray(data.repos) ? data.repos : []);
     } catch (err) {
       setError(true);
     } finally {
@@ -102,18 +111,45 @@ export const GitHubReposSection: React.FC = () => {
     fetchRepos();
   }, []);
 
-  const filteredRepos = repos.filter((repo) => {
+  const handleGenerate = async (repo: GitHubRepo) => {
+    setGenerating(repo.name);
+    try {
+      const res = await fetch('/api/github', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo: repo.full_name })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        await fetchRepos();
+      } else {
+        alert(t.githubGenerateError);
+      }
+    } catch (err) {
+      alert(t.githubGenerateError);
+    } finally {
+      setGenerating(null);
+    }
+  };
+
+  const visibleRepos = React.useMemo(() => {
+    let list = repos.filter((r) => (showPrivate ? true : !r.private));
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return true;
-    return (
-      repo.name.toLowerCase().includes(q) ||
-      (repo.description ?? '').toLowerCase().includes(q) ||
-      (repo.language ?? '').toLowerCase().includes(q) ||
-      repo.topics.some((topic) => topic.toLowerCase().includes(q))
-    );
-  });
+    if (q) {
+      list = list.filter((repo) =>
+        repo.name.toLowerCase().includes(q) ||
+        (repo.description ?? '').toLowerCase().includes(q) ||
+        (repo.language ?? '').toLowerCase().includes(q) ||
+        repo.topics.some((topic) => topic.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [repos, searchQuery, showPrivate]);
+
+  const filteredRepos = visibleRepos;
 
   const formatDate = (iso: string) => {
+    if (!iso) return '—';
     return new Date(iso).toLocaleDateString(isArabic ? 'ar-EG' : 'en-US', {
       year: 'numeric',
       month: 'short',
@@ -171,17 +207,31 @@ export const GitHubReposSection: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300">
-              <Code2 className="w-4 h-4 text-cyan-400" />
-              <span>
-                {filteredRepos.length}
-                <span className="text-slate-500"> / {t.githubCount}</span>
+              <Globe className="w-4 h-4 text-cyan-400" />
+              <span>{repos.filter(r => !r.private).length}</span>
+              <span className="text-slate-500">/</span>
+              <span className="flex items-center gap-1">
+                <Lock className="w-3 h-3 text-amber-400" />
+                {repos.filter(r => r.private).length}
               </span>
             </div>
+
+            <button
+              onClick={() => setShowPrivate((p) => !p)}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all ${
+                showPrivate
+                  ? 'bg-cyan-950/80 border-cyan-500/50 text-cyan-300'
+                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <LockKeyhole className="w-3.5 h-3.5" />
+              <span>{showPrivate ? 'All visible' : 'Public only'}</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Sync Status / Error */}
+      {/* Error */}
       {error && (
         <div className="bg-slate-900/80 border border-red-500/40 rounded-2xl p-6 text-center space-y-4 font-mono">
           <div className="text-sm text-red-300 flex items-center justify-center gap-2">
@@ -198,14 +248,14 @@ export const GitHubReposSection: React.FC = () => {
         </div>
       )}
 
-      {/* Loading Skeletons */}
+      {/* Loading */}
       {loading && !error && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((n) => <SkeletonCard key={n} />)}
         </div>
       )}
 
-      {/* Repository Grid */}
+      {/* Grid */}
       {!loading && !error && (
         <>
           {filteredRepos.length === 0 ? (
@@ -221,37 +271,38 @@ export const GitHubReposSection: React.FC = () => {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
               {filteredRepos.map((repo) => (
-                <motion.a
+                <motion.div
                   key={repo.name}
                   variants={itemVariants}
-                  href={repo.html_url}
-                  target="_blank"
-                  rel="noreferrer"
                   className="group bg-slate-900/70 border border-slate-800 hover:border-cyan-500/50 rounded-2xl p-6 backdrop-blur-md flex flex-col justify-between space-y-4 transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(6,182,212,0.15)] relative overflow-hidden"
                 >
                   <div className="space-y-3">
                     {/* Repo Header */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-9 h-9 shrink-0 rounded-lg flex items-center justify-center border ${
-                          repo.language
-                            ? 'bg-slate-950'
-                            : 'bg-slate-950'
-                        } text-cyan-400`}
+                        <div className={`w-9 h-9 shrink-0 rounded-lg flex items-center justify-center border ${repo.private ? 'bg-amber-950/60 border-amber-500/40' : 'bg-slate-950 border-slate-800'} text-cyan-400`}
                           style={repo.language ? { color: LANGUAGE_COLORS[repo.language] ?? '#06b6d4', borderColor: `${LANGUAGE_COLORS[repo.language] ?? '#06b6d4'}55` } : undefined}
                         >
                           {repoCategoryIcon(repo)}
                         </div>
                         <div className="min-w-0">
-                          <div className="font-bold text-sm text-white group-hover:text-cyan-300 transition-colors truncate font-mono">
+                          <div className="font-bold text-sm text-white group-hover:text-cyan-300 transition-colors truncate font-mono flex items-center gap-1.5">
                             {repo.name}
+                            {repo.private && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/40 font-bold uppercase shrink-0">
+                                <Lock className="w-2.5 h-2.5" />
+                                {t.githubPrivate}
+                              </span>
+                            )}
                           </div>
                           <div className="text-[10px] text-slate-500 font-mono truncate">
                             {repo.full_name}
                           </div>
                         </div>
                       </div>
-                      <ExternalLink className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 shrink-0 transition-colors" />
+                      <a href={repo.html_url} target="_blank" rel="noreferrer" className="shrink-0">
+                        <ExternalLink className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 transition-colors" />
+                      </a>
                     </div>
 
                     {/* Description */}
@@ -259,16 +310,29 @@ export const GitHubReposSection: React.FC = () => {
                       {repo.description || <span className="text-slate-600 italic">—</span>}
                     </p>
 
-                    {/* Topics */}
-                    {repo.topics.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {repo.topics.slice(0, 3).map((topic) => (
-                          <span key={topic} className="bg-slate-950 text-cyan-400/90 text-[10px] px-2 py-0.5 rounded border border-slate-800 font-mono">
-                            {topic}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {/* README → Post action */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {repo.has_readme && repo.postId ? (
+                        <span className="inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 font-mono">
+                          <FileText className="w-3 h-3" />
+                          <span>{t.githubReadPost}</span>
+                          {repo.postStale && <span className="text-amber-300">•</span>}
+                        </span>
+                      ) : repo.has_readme ? (
+                        <button
+                          onClick={() => handleGenerate(repo)}
+                          disabled={generating === repo.name}
+                          className="inline-flex items-center gap-1.5 text-[10px] px-2 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-900/60 font-mono transition-colors"
+                        >
+                          {generating === repo.name
+                            ? <Loader2 className="w-3 h-3 animate-spin" />
+                            : <FileText className="w-3 h-3" />}
+                          <span>{t.githubGenerate}</span>
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-slate-600 italic font-sans">No README</span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Meta Footer */}
@@ -296,7 +360,7 @@ export const GitHubReposSection: React.FC = () => {
                       {t.githubUpdated} {formatDate(repo.updated_at)}
                     </span>
                   </div>
-                </motion.a>
+                </motion.div>
               ))}
             </motion.div>
           )}

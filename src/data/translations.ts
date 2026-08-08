@@ -267,6 +267,10 @@ export const translations = {
     githubError: 'Unable to reach the GitHub grid. Verify connection and retry.',
     githubRetry: 'Retry Sync',
     githubNoResults: 'No repositories match that frequency.',
+    githubPrivate: 'Private',
+    githubReadPost: 'Read post',
+    githubGenerate: 'Generate post from README',
+    githubGenerateError: 'Failed to generate post. Please sign in as admin in the dashboard section.',
 
     // Skills Section (additional)
     skillsCelestial: 'CELESTIAL CAPABILITIES SECTOR',
@@ -581,6 +585,10 @@ export const translations = {
     githubError: 'تعذر الوصول إلى شبكة GitHub. تحقق من الاتصال وأعد المحاولة.',
     githubRetry: 'إعادة المزامنة',
     githubNoResults: 'لا توجد مستودعات مطابقة لهذا التردد.',
+    githubPrivate: 'خاص',
+    githubReadPost: 'اقرأ المقال',
+    githubGenerate: 'أنشئ مقالاً من README',
+    githubGenerateError: 'فشل إنشاء المقال. سجّل الدخول كمسؤول في لوحة التحكم أولاً.',
 
     // Skills Section (additional)
     skillsCelestial: 'قطاع القدرات السماوية',

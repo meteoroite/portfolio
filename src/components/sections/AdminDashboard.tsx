@@ -28,8 +28,33 @@ import {
   Smartphone,
   Shield,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Database,
+  LockKeyhole,
+  Loader2,
+  Terminal,
+  Server,
+  Zap,
+  ExternalLink,
+  UploadCloud,
+  Wand2
 } from 'lucide-react';
+
+interface RepoAutomation {
+  name: string;
+  full_name: string;
+  html_url: string;
+  private: boolean;
+  description: string | null;
+  language: string | null;
+  updated_at: string;
+  archived: boolean;
+  fork: boolean;
+  topics: string[];
+  has_readme: boolean;
+  postId: string | null;
+  postStale: boolean;
+}
 
 export const AdminDashboard: React.FC = () => {
   const [passkey, setPasskey] = useState<string>('');
@@ -46,13 +71,21 @@ export const AdminDashboard: React.FC = () => {
   const [otpMessage, setOtpMessage] = useState<string>('');
 
   // Active Admin Sub-tab
-  const [adminTab, setAdminTab] = useState<'overview' | 'posts' | 'projects'>('overview');
+  const [adminTab, setAdminTab] = useState<'overview' | 'posts' | 'projects' | 'automation'>('overview');
 
   // Data State
   const [projects, setProjects] = useState<Project[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Automation State
+  const [repos, setRepos] = useState<RepoAutomation[]>([]);
+  const [reposLoading, setReposLoading] = useState<boolean>(false);
+  const [syncRunning, setSyncRunning] = useState<boolean>(false);
+  const [tokenConfigured, setTokenConfigured] = useState<boolean>(false);
+  const [kvConnected, setKvConnected] = useState<boolean>(false);
+  const [privateLocked, setPrivateLocked] = useState<boolean>(false);
 
   // Modal / Form States
   const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
@@ -154,6 +187,104 @@ export const AdminDashboard: React.FC = () => {
       setLoadingData(false);
     }
   };
+
+  // --- Automation: GitHub repos & README → blog post pipeline ---
+  const loadRepos = async () => {
+    setReposLoading(true);
+    try {
+      const res = await fetch('/api/github', {
+        headers: { 'x-admin-passkey': passkey },
+      });
+      if (!res.ok) throw new Error(res.status === 503 ? 'Admin access not configured' : 'API error');
+      const data = await res.json();
+      setTokenConfigured(Boolean(data.tokenConfigured));
+      setKvConnected(Boolean(data.kv));
+      setPrivateLocked(Boolean(data.privateLocked));
+      setRepos(Array.isArray(data.repos) ? data.repos : []);
+    } catch (err) {
+      setStatusMessage({ type: 'error', text: String(err?.message || err) });
+      setTimeout(() => setStatusMessage(null), 4000);
+    } finally {
+      setReposLoading(false);
+    }
+  };
+
+  const handleGenerateRepoPost = async (repo: RepoAutomation) => {
+    setSyncRunning(true);
+    try {
+      const res = await fetch('/api/github', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-passkey': passkey },
+        body: JSON.stringify({ repo: repo.full_name })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatusMessage({ type: 'success', text: `Post ${data.created ? 'created' : 'regenerated'} from ${repo.name} README.` });
+        await loadRepos();
+        await loadAdminData();
+      } else {
+        setStatusMessage({ type: 'error', text: data.error || 'Generation failed' });
+      }
+    } catch (err) {
+      setStatusMessage({ type: 'error', text: 'Network error during generation' });
+    } finally {
+      setSyncRunning(false);
+      setTimeout(() => setStatusMessage(null), 4000);
+    }
+  };
+
+  const handleSyncAll = async () => {
+    setSyncRunning(true);
+    setStatusMessage({ type: 'success', text: 'Scanning all repositories & generating posts from README files...' });
+    try {
+      const res = await fetch('/api/github', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-passkey': passkey },
+        body: JSON.stringify({ action: 'sync' })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatusMessage({
+          type: 'success',
+          text: `Sync complete — scanned ${data.scanned} repos, created ${data.created} new posts${data.skippedNoReadme?.length ? `, skipped ${data.skippedNoReadme.length} without README` : ''}.`
+        });
+        await loadRepos();
+        await loadAdminData();
+      } else {
+        setStatusMessage({ type: 'error', text: data.error || 'Sync failed' });
+      }
+    } catch (err) {
+      setStatusMessage({ type: 'error', text: 'Network error during sync' });
+    } finally {
+      setSyncRunning(false);
+      setTimeout(() => setStatusMessage(null), 6000);
+    }
+  };
+
+  const handleDeleteGeneratedPost = async (postId: string) => {
+    if (!window.confirm("Delete this README-generated post?")) return;
+    try {
+      const res = await fetch('/api/github', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'x-admin-passkey': passkey },
+        body: JSON.stringify({ postId })
+      });
+      const data = await res.json();
+      setStatusMessage({ type: data.success ? 'success' : 'error', text: data.message || 'Done' });
+      await loadRepos();
+      await loadAdminData();
+      setTimeout(() => setStatusMessage(null), 4000);
+    } catch (err) {
+      setStatusMessage({ type: 'error', text: 'Error removing post' });
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && adminTab === 'automation' && repos.length === 0 && !reposLoading) {
+      loadRepos();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adminTab, isAuthenticated]);
 
   // --- POST MANAGEMENT ---
   const handleSavePost = async (e: React.FormEvent) => {
@@ -461,6 +592,14 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             Projects ({projects.length})
+          </button>
+          <button
+            onClick={() => setAdminTab('automation')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+              adminTab === 'automation' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Auto Workspace
           </button>
         </div>
       </div>
@@ -977,6 +1116,211 @@ export const AdminDashboard: React.FC = () => {
                       <span>Delete</span>
                     </button>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+    {/* AUTOMATION WORKSPACE TAB */}
+      {adminTab === 'automation' && (
+        <div className="space-y-6">
+          {/* Header row */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <GitBranch className="w-5 h-5 text-cyan-400" />
+              <span>GitHub Automation Workspace</span>
+            </h3>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border font-mono ${
+                tokenConfigured ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-amber-950 text-amber-300 border-amber-500/40'
+              }`}>
+                <Server className="w-3 h-3" />
+                {tokenConfigured ? 'GITHUB TOKEN ACTIVE' : 'PUBLIC-ONLY MODE (TOKEN NOT SET)'}
+              </span>
+              <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border font-mono ${
+                kvConnected ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-slate-900 text-slate-400 border-slate-700'
+              }`}>
+                <Zap className="w-3 h-3" />
+                {kvConnected ? 'KV PERSISTENCE LIVE' : 'EPHEMERAL STORAGE'}
+              </span>
+            </div>
+          </div>
+
+          {/* Status banner */}
+          {privateLocked && (
+            <div className="p-4 bg-amber-950/60 border border-amber-500/30 rounded-xl text-xs text-amber-200 flex items-start gap-3">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <p className="font-sans leading-relaxed">
+                <span className="font-bold">Private repository visibility is locked.</span> Add a
+                <code className="mx-1 px-1.5 py-0.5 bg-slate-950 rounded text-cyan-300">GITHUB_TOKEN</code>
+                environment variable on Vercel to list this account's private repositories. Until then only public repositories are returned.
+              </p>
+            </div>
+          )}
+
+          {/* System status cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-1">
+              <div className="text-[10px] uppercase text-slate-500 font-bold">Repos Scanned</div>
+              <div className="text-2xl font-extrabold text-cyan-400">{repos.length}</div>
+              <div className="text-[10px] text-slate-400">{repos.filter(r => r.private).length} private</div>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-1">
+              <div className="text-[10px] uppercase text-slate-500 font-bold">Posts Generated</div>
+              <div className="text-2xl font-extrabold text-blue-400">{repos.filter(r => r.postId).length}</div>
+              <div className="text-[10px] text-slate-400">{repos.filter(r => r.postStale).length} stale (needs regen)</div>
+            </div>
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-1">
+              <div className="text-[10px] uppercase text-slate-500 font-bold">READMEs Found</div>
+              <div className="text-2xl font-extrabold text-emerald-400">{repos.filter(r => r.has_readme).length}</div>
+              <div className="text-[10px] text-slate-400">{repos.filter(r => r.has_readme && !r.postId).length} awaiting generation</div>
+            </div>
+          </div>
+
+          {/* Action bar */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="text-xs font-bold text-white flex items-center gap-2">
+                <Wand2 className="w-4 h-4 text-cyan-400" />
+                <span>One-Click Sync: README → Blog Post</span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-sans">
+                Scans every repository, reads its README markdown, and automatically drafts a published engineering post with tags, read-time, and a summary.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={loadRepos}
+                disabled={reposLoading || syncRunning}
+                className="px-4 py-2 border border-slate-700 text-slate-200 hover:bg-slate-800 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${reposLoading ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </button>
+              <button
+                onClick={handleSyncAll}
+                disabled={reposLoading || syncRunning}
+                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all disabled:opacity-50"
+              >
+                {syncRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
+                <span>{syncRunning ? 'Working...' : 'Sync & Auto-Generate All'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Repos list */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden backdrop-blur-md">
+            {reposLoading && !syncRunning ? (
+              <div className="p-10 flex items-center justify-center gap-3 text-slate-400 text-sm font-mono">
+                <Loader2 className="w-5 h-5 animate-spin text-cyan-400" />
+                <span>Scanning GitHub grid...</span>
+              </div>
+            ) : repos.length === 0 ? (
+              <div className="p-10 text-center space-y-3">
+                <Database className="w-10 h-10 text-slate-600 mx-auto" />
+                <p className="text-slate-400 text-sm font-mono">No repositories returned. Vercel API may be warming up — click Refresh.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-800 max-h-[560px] overflow-y-auto">
+                {repos.map((repo) => (
+                  <div key={repo.full_name} className="p-4 sm:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-3 hover:bg-slate-900/80 transition-colors">
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {repo.private && (
+                          <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-500/40 font-bold uppercase">
+                            <LockKeyhole className="w-2.5 h-2.5" />
+                            Private
+                          </span>
+                        )}
+                        {repo.archived && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-bold uppercase">
+                            Archived
+                          </span>
+                        )}
+                        <span className="text-sm font-bold text-white font-mono truncate">{repo.name}</span>
+                        {repo.language && (
+                          <span className="text-[10px] text-slate-400 font-mono">{repo.language}</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-400 line-clamp-1 font-sans max-w-2xl">
+                        {repo.description || <span className="italic text-slate-600">No description</span>}
+                      </p>
+                      <div className="flex items-center gap-3 text-[10px] text-slate-500 font-mono">
+                        {repo.has_readme ? (
+                          <span className="text-emerald-400">✓ README</span>
+                        ) : (
+                          <span className="text-slate-600">No README</span>
+                        )}
+                        {repo.postId && <span className="text-cyan-400">Post: {repo.postId}</span>}
+                        {repo.postStale && <span className="text-amber-400">STALE</span>}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <a
+                        href={repo.html_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors"
+                        title="Open on GitHub"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                      {repo.has_readme && repo.postId ? (
+                        <>
+                          <button
+                            onClick={() => handleGenerateRepoPost(repo)}
+                            disabled={syncRunning}
+                            className="px-3 py-2 bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 rounded-lg border border-emerald-500/30 text-xs font-bold disabled:opacity-50 transition-colors"
+                          >
+                            Regenerate
+                          </button>
+                          <button
+                            onClick={() => handleDeleteGeneratedPost(repo.postId!)}
+                            disabled={syncRunning}
+                            className="px-3 py-2 bg-red-950/60 hover:bg-red-900/60 text-red-300 rounded-lg border border-red-500/30 text-xs font-bold disabled:opacity-50 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      ) : repo.has_readme ? (
+                        <button
+                          onClick={() => handleGenerateRepoPost(repo)}
+                          disabled={syncRunning}
+                          className="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 disabled:opacity-50 transition-colors"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          Generate
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-slate-600 px-3 py-2">—</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Pipeline how-it-works */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-3">
+            <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Terminal className="w-4 h-4 text-cyan-400" />
+              <span>Pipeline architecture</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-[11px] font-sans text-slate-400">
+              {[
+                { step: '01', title: 'Scan', text: 'Server-side proxy fetches every repo (public + private with GITHUB_TOKEN).' },
+                { step: '02', title: 'Read', text: 'README.md pulled raw from the GitHub API for each repository.' },
+                { step: '03', title: 'Generate', text: 'Title, summary, tags, read-time and markdown body derived automatically.' },
+                { step: '04', title: 'Persist', text: 'Posts stored in Vercel KV so they survive cold starts and regenerations.' }
+              ].map(item => (
+                <div key={item.step} className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                  <div className="text-cyan-400 font-mono font-bold">{item.step}</div>
+                  <div className="font-bold text-slate-200">{item.title}</div>
+                  <div className="leading-relaxed">{item.text}</div>
                 </div>
               ))}
             </div>
